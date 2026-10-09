@@ -178,12 +178,12 @@ Helper compartido (exportar y reutilizar en pasos 2 y 3): `spiral(n: number): Ar
 **Interfaces — Produces:**
 ```ts
 export class CityError extends Error { code: ApiErrorCode }
-export async function fetchCity(user: string, fetchImpl = fetch): Promise<CityResponse>;
+export async function fetchCity(user: string, fetchImpl: typeof fetch): Promise<CityResponse>;
 ```
 
-- [ ] **Step 1: Tests que fallan** (con `fetchImpl` falso): 200 → devuelve el JSON; 404 `{error:'USER_NOT_FOUND'}` → lanza `CityError` con `code === 'USER_NOT_FOUND'`; fallo de red (fetch rechaza) → `code === 'UPSTREAM_ERROR'`; el usuario se pasa con `encodeURIComponent` y `trim()`.
-- [ ] **Step 2:** FAIL → implementar → PASS.
-- [ ] **Step 3:** Commit `feat: cliente fetchCity`.
+- [x] **Step 1: Tests que fallan** (con `fetchImpl` falso): 200 → devuelve el JSON; 404 `{error:'USER_NOT_FOUND'}` → lanza `CityError` con `code === 'USER_NOT_FOUND'`; fallo de red (fetch rechaza) → `code === 'UPSTREAM_ERROR'`; el usuario se pasa con `encodeURIComponent` y `trim()`.
+- [x] **Step 2:** FAIL → implementar → PASS.
+- [x] **Step 3:** Commit `feat: cliente fetchCity`.
 
 ✅ **Fin del día 2:** `npm test` en verde con toda la lógica.
 
