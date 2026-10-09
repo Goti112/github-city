@@ -155,7 +155,7 @@ export function cityLayout(repos: Repo[], now: Date): Building[];
 
 Helper compartido (exportar y reutilizar en pasos 2 y 3): `spiral(n: number): Array<[number, number]>` → las primeras `n` coordenadas enteras de una espiral cuadrada empezando en `[0,0]`.
 
-- [ ] **Step 1: Tests que fallan:**
+- [x] **Step 1: Tests que fallan:**
   - `buildingHeight(0) === 1`; `buildingHeight(1) === 2.5`; `buildingHeight(2000) < 18`.
   - `plotSize`: `0 → 1`, `1 → 1.5`, `9 → 1.5`, `10 → 2`.
   - `litRatio`: hace 10 días → `1`; hace 30 → `1`; hace 365 → `0.05`; hace 800 → `0.05`; hace ~197 días ≈ `0.525` (±0.01); fecha futura → `1`.
@@ -166,10 +166,10 @@ Helper compartido (exportar y reutilizar en pasos 2 y 3): `spiral(n: number): Ar
   - Dentro de un barrio, el edificio más alto está en la celda central del barrio.
   - Todos los repos con `language: null` → todos `district === 'Otros'` y `color === NEUTRAL_COLOR`.
   - `color` de un repo con `languageColor: '#3178c6'` ≠ `'#3178c6'` y es `#rrggbb` válido.
-- [ ] **Step 2:** `npm test` → FAIL.
-- [ ] **Step 3:** Implementar.
-- [ ] **Step 4:** `npm test` → PASS.
-- [ ] **Step 5:** Commit `feat: layout de la ciudad`.
+- [x] **Step 2:** `npm test` → FAIL.
+- [x] **Step 3:** Implementar.
+- [x] **Step 4:** `npm test` → PASS.
+- [x] **Step 5:** Commit `feat: layout de la ciudad`.
 
 ### Task 4: Cliente de la API
 
