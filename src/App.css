@@ -72,6 +72,42 @@
   height: 100% !important;
 }
 
+.lighting-control {
+  position: absolute;
+  z-index: 3;
+  top: 22px;
+  right: 22px;
+  display: flex;
+  gap: 4px;
+  border: 1px solid rgba(191, 221, 225, 0.18);
+  border-radius: 999px;
+  padding: 4px;
+  background: rgba(9, 16, 23, 0.82);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(12px);
+}
+
+.lighting-control button {
+  border: 0;
+  border-radius: 999px;
+  padding: 8px 12px;
+  background: transparent;
+  color: #a9bac5;
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.lighting-control button[aria-pressed="true"] {
+  background: rgba(115, 224, 192, 0.16);
+  color: #dffbf2;
+}
+
+.lighting-control button:focus-visible {
+  outline: 2px solid #73e0c0;
+  outline-offset: 2px;
+}
+
 .city-page__status {
   position: absolute;
   z-index: 1;
@@ -279,6 +315,16 @@
 }
 
 @media (max-width: 600px) {
+  .lighting-control {
+    top: 136px;
+    right: 12px;
+  }
+
+  .lighting-control button {
+    padding: 7px 9px;
+    font-size: 0.76rem;
+  }
+
   .user-card {
     top: 12px;
     left: 12px;

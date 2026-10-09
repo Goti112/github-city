@@ -1,14 +1,18 @@
-import { Suspense, type ReactElement } from 'react'
+import { Suspense, useMemo, type ReactElement } from 'react'
 import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import type { Building } from '../lib/types'
 import type { PointerPosition } from '../ui/Tooltip'
 import Buildings from './Buildings'
 import Ground from './Ground'
+import Sky from './Sky'
+import { KEYFRAMES } from './timeOfDay'
+import type { WindowGlowUniform } from './windowsMaterial'
 
 type CitySceneProps = {
   buildings: Building[]
   avatarUrl: string
+  timeOfDay: number
   hovered: number | null
   onHover: (index: number | null, position: PointerPosition | null) => void
   onSelect: (index: number) => void
@@ -24,11 +28,16 @@ const cameraMaxDistance = (buildings: Building[]): number => {
 const CityScene = ({
   buildings,
   avatarUrl,
+  timeOfDay,
   hovered,
   onHover,
   onSelect,
 }: CitySceneProps): ReactElement => {
   const maxDistance = cameraMaxDistance(buildings)
+  const windowGlow = useMemo<WindowGlowUniform>(
+    () => ({ value: KEYFRAMES.sunset.windowGlow }),
+    [],
+  )
 
   return (
     <div className="city-scene" role="region" aria-label="Escena 3D de repositorios">
@@ -37,21 +46,13 @@ const CityScene = ({
         gl={{ preserveDrawingBuffer: true }}
         camera={{ position: [40, 40, 40], fov: 45 }}
       >
-        <color attach="background" args={['#101820']} />
-        <fog attach="fog" args={['#101820', maxDistance * 0.38, maxDistance * 1.25]} />
-        <ambientLight intensity={1.05} />
-        <directionalLight
-          castShadow
-          position={[35, 55, 24]}
-          intensity={1.8}
-          shadow-mapSize-width={2048}
-          shadow-mapSize-height={2048}
-        />
+        <Sky timeOfDay={timeOfDay} maxDistance={maxDistance} windowGlow={windowGlow} />
         <Suspense fallback={null}>
           <Ground avatarUrl={avatarUrl} />
         </Suspense>
         <Buildings
           buildings={buildings}
+          windowGlow={windowGlow}
           hovered={hovered}
           onHover={onHover}
           onSelect={onSelect}

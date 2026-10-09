@@ -258,9 +258,9 @@ export const KEYFRAMES: Record<'day' | 'sunset' | 'night', Lighting>;
 export function lightingAt(t: number): Lighting; // t ∈ [0,1]: 0 = día, 0.5 = atardecer, 1 = noche; fuera de rango se acota
 ```
 
-- [ ] **Step 1: Tests que fallan:** `lightingAt(0)` = `KEYFRAMES.day`; `lightingAt(0.5)` = `KEYFRAMES.sunset`; `lightingAt(1)` = `KEYFRAMES.night`; `lightingAt(0.25).sun` entre los de day y sunset; `lightingAt(-1)` = day y `lightingAt(2)` = night; `KEYFRAMES.day.bloom === 0`.
-- [ ] **Step 2:** FAIL → implementar (interpolación lineal de números y de colores hex) → PASS.
-- [ ] **Step 3:** Commit `feat: interpolación día/noche`.
+- [x] **Step 1: Tests que fallan:** `lightingAt(0)` = `KEYFRAMES.day`; `lightingAt(0.5)` = `KEYFRAMES.sunset`; `lightingAt(1)` = `KEYFRAMES.night`; `lightingAt(0.25).sun` entre los de day y sunset; `lightingAt(-1)` = day y `lightingAt(2)` = night; `KEYFRAMES.day.bloom === 0`.
+- [x] **Step 2:** FAIL → implementar (interpolación lineal de números y de colores hex) → PASS.
+- [x] **Step 3:** Commit `feat: interpolación día/noche`.
 
 ### Task 9b: Ventanas, cielo, bloom y animación de entrada
 
@@ -268,14 +268,16 @@ export function lightingAt(t: number): Lighting; // t ∈ [0,1]: 0 = día, 0.5 =
 
 **Interfaces — Consumes:** `lightingAt` (9a), `Building.litRatio`.
 
-- [ ] **Step 1:** `windowsMaterial`: `MeshStandardMaterial` con `onBeforeCompile` que, a partir de las UV de las caras laterales, dibuja una rejilla de ventanas; cada ventana se enciende si `hash(instanceId, celda) < litRatio` (atributo instanciado `aLit`). Emisión de ventanas multiplicada por un uniform `uGlow` = `lighting.windowGlow`. Tejados sin ventanas.
-- [ ] **Step 2:** `Sky`: color de fondo/niebla y luces desde `lightingAt(t)`. Estado `t` en `CityPage`, valor inicial `0.5` (atardecer); transición animada de ~1,5 s al cambiar.
-- [ ] **Step 3:** `EffectComposer` + `Bloom` con `intensity = lighting.bloom` (0 de día).
-- [ ] **Step 4:** Animación de entrada: escala Y de cada instancia de 0 a 1 en ~1,2 s con *ease-out* y retraso proporcional a la distancia al centro.
+- [x] **Step 1:** `windowsMaterial`: `MeshStandardMaterial` con `onBeforeCompile` que, a partir de las UV de las caras laterales, dibuja una rejilla de ventanas; cada ventana se enciende si `hash(instanceId, celda) < litRatio` (atributo instanciado `aLit`). Emisión de ventanas multiplicada por un uniform `uGlow` = `lighting.windowGlow`. Tejados sin ventanas.
+- [x] **Step 2:** `Sky`: color de fondo/niebla y luces desde `lightingAt(t)`. Estado `t` en `CityPage`, valor inicial `0.5` (atardecer); transición animada de ~1,5 s al cambiar.
+- [x] **Step 3:** `EffectComposer` + `Bloom` con `intensity = lighting.bloom` (0 de día).
+- [x] **Step 4:** Animación de entrada: escala Y de cada instancia de 0 a 1 en ~1,2 s con *ease-out* y retraso proporcional a la distancia al centro.
 - [ ] **Step 5: Verificar:** de noche los repos recientes brillan y los viejos están oscuros; FPS ~60 con un usuario de ~100 repos (drei `<Perf>` o `stats` temporal; quitarlo después). **👤 Paso manual:** juicio estético.
-- [ ] **Step 6:** Commit `feat: ventanas, día/noche y bloom`.
+  - **Estado:** falta la revisión visual y la medición de FPS. El build valida TypeScript, pero no compila el shader GLSL; la inspección de localhost quedó bloqueada por la política del navegador en días anteriores.
+  - **Nota de alcance:** se añadió en `CityPage` un selector temporal de día, atardecer y noche para revisar la escena; en el Día 6 se integrará en `Toolbar`.
+- [x] **Step 6:** Commit `feat: ventanas, día/noche y bloom`.
 
-✅ **Fin del día 5:** la ciudad de noche es el plano para el vídeo de LinkedIn.
+⏸️ **Fin de implementación del día 5:** escena lista para revisión visual; no comenzar el Día 6 hasta revisar este día.
 
 ---
 

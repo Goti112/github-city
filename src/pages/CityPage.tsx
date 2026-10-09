@@ -29,6 +29,12 @@ type CityPageContentProps = {
   user: string | undefined
 }
 
+const lightingOptions = [
+  { value: 0, label: 'Día' },
+  { value: 0.5, label: 'Atardecer' },
+  { value: 1, label: 'Noche' },
+]
+
 const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
   const [requestState, setRequestState] = useState<RequestState>(() => ({
     user,
@@ -40,6 +46,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
     pointerPosition: null,
     selectedRepo: null,
   }))
+  const [timeOfDay, setTimeOfDay] = useState<number>(0.5)
 
   useEffect(() => {
     if (user === undefined) {
@@ -145,10 +152,23 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
           <CityScene
             buildings={buildings}
             avatarUrl={state.data.user.avatarUrl}
+            timeOfDay={timeOfDay}
             hovered={interaction.hoveredIndex}
             onHover={handleHover}
             onSelect={handleSelect}
           />
+          <div className="lighting-control" role="group" aria-label="Momento del día">
+            {lightingOptions.map(({ value, label }) => (
+              <button
+                key={value}
+                type="button"
+                aria-pressed={timeOfDay === value}
+                onClick={() => setTimeOfDay(value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
           <UserCard
             user={state.data.user}
             repositoryCount={state.data.repos.length}
