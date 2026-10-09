@@ -160,6 +160,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
             onHover={handleHover}
             onSelect={handleSelect}
             onCanvasReady={handleCanvasReady}
+            autoRotateSpeed={0}
           />
           <Toolbar canvas={canvas} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} />
           <UserCard

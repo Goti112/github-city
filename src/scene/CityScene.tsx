@@ -15,9 +15,10 @@ type CitySceneProps = {
   avatarUrl: string
   timeOfDay: number
   hovered: number | null
-  onHover: (index: number | null, position: PointerPosition | null) => void
-  onSelect: (index: number) => void
+  onHover?: (index: number | null, position: PointerPosition | null) => void
+  onSelect?: (index: number) => void
   onCanvasReady?: (canvas: HTMLCanvasElement) => void
+  autoRotateSpeed: number
 }
 
 // R3F only reads the Canvas camera prop on mount, so re-frame when the city changes.
@@ -38,6 +39,7 @@ const CityScene = ({
   onHover,
   onSelect,
   onCanvasReady,
+  autoRotateSpeed,
 }: CitySceneProps): ReactElement => {
   const framing = useMemo(() => cameraFraming(buildings), [buildings])
   const windowGlow = useMemo<WindowGlowUniform>(
@@ -75,6 +77,8 @@ const CityScene = ({
           maxPolarAngle={Math.PI / 2.2}
           minDistance={10}
           maxDistance={framing.maxDistance}
+          autoRotate={autoRotateSpeed > 0}
+          autoRotateSpeed={autoRotateSpeed}
           enableDamping
           dampingFactor={0.08}
         />

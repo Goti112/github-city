@@ -17,8 +17,8 @@ type BuildingsProps = {
   buildings: Building[]
   windowGlow: WindowGlowUniform
   hovered: number | null
-  onHover: (index: number | null, position: PointerPosition | null) => void
-  onSelect: (index: number) => void
+  onHover?: (index: number | null, position: PointerPosition | null) => void
+  onSelect?: (index: number) => void
 }
 
 const entranceDuration = 1.2
@@ -123,7 +123,7 @@ const Buildings = ({
   }, [buildings, hovered])
 
   const handlePointerMove = useCallback((event: ThreeEvent<PointerEvent>): void => {
-    if (event.instanceId === undefined) {
+    if (onHover === undefined || event.instanceId === undefined) {
       return
     }
 
@@ -132,11 +132,11 @@ const Buildings = ({
   }, [onHover])
 
   const handlePointerOut = useCallback((): void => {
-    onHover(null, null)
+    onHover?.(null, null)
   }, [onHover])
 
   const handleClick = useCallback((event: ThreeEvent<MouseEvent>): void => {
-    if (event.instanceId === undefined || !isClickGesture(event.delta)) {
+    if (onSelect === undefined || event.instanceId === undefined || !isClickGesture(event.delta)) {
       return
     }
 
@@ -154,9 +154,9 @@ const Buildings = ({
       args={[geometry, material, buildings.length]}
       castShadow
       receiveShadow
-      onPointerMove={handlePointerMove}
-      onPointerOut={handlePointerOut}
-      onClick={handleClick}
+      onPointerMove={onHover === undefined ? undefined : handlePointerMove}
+      onPointerOut={onHover === undefined ? undefined : handlePointerOut}
+      onClick={onSelect === undefined ? undefined : handleClick}
     />
   )
 }
