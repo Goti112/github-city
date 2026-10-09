@@ -226,9 +226,9 @@ export async function fetchCity(user: string, fetchImpl: typeof fetch): Promise<
 
 **Interfaces — Consumes:** `CityResponse`, `Repo`, `Building`.
 
-- [ ] **Step 1:** `UserCard` (arriba izquierda): avatar, nombre (o login), nº de repos, contribuciones del último año.
-- [ ] **Step 2:** `RepoPanel({ repo, onClose })`: nombre, descripción, ⭐, lenguaje, commits, último push en formato relativo (`Intl.RelativeTimeFormat('es')`), botón "Ver en GitHub" (`target="_blank" rel="noopener"`). Lateral ≥ 768 px, *bottom sheet* por debajo. Cierra con Esc y con ×.
-- [ ] **Step 3:** `Tooltip`: sigue al puntero y muestra el nombre del repo.
+- [x] **Step 1:** `UserCard` (arriba izquierda): avatar, nombre (o login), nº de repos, contribuciones del último año.
+- [x] **Step 2:** `RepoPanel({ repo, onClose })`: nombre, descripción, ⭐, lenguaje, commits, último push en formato relativo (`Intl.RelativeTimeFormat('es')`), botón "Ver en GitHub" (`target="_blank" rel="noopener"`). Lateral ≥ 768 px, *bottom sheet* por debajo. Cierra con Esc y con ×.
+- [x] **Step 3:** `Tooltip`: sigue al puntero y muestra el nombre del repo.
 - [ ] **Step 4:** Commit `feat: UserCard, RepoPanel y Tooltip`.
 
 ### Task 8: Hover y clic sobre edificios
