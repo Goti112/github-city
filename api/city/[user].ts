@@ -4,8 +4,8 @@ import {
   errorFromGithub,
   isValidUsername,
   transformGithubResponse,
-} from '../../src/lib/github'
-import type { ApiErrorCode } from '../../src/lib/types'
+} from '../../src/lib/github.js'
+import type { ApiErrorCode } from '../../src/lib/types.js'
 
 const GITHUB_GRAPHQL_URL = 'https://api.github.com/graphql'
 const MAX_GITHUB_ATTEMPTS = 3
