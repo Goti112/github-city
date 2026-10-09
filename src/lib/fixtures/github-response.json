@@ -1,0 +1,60 @@
+{
+  "data": {
+    "user": {
+      "login": "octocat",
+      "name": "Mona Lisa",
+      "avatarUrl": "https://avatars.githubusercontent.com/u/583231?v=4",
+      "contributionsCollection": {
+        "contributionCalendar": {
+          "totalContributions": 20,
+          "weeks": [
+            {
+              "contributionDays": [
+                { "date": "2026-10-07", "contributionCount": 4 },
+                { "date": "2026-09-20", "contributionCount": 3 }
+              ]
+            },
+            {
+              "contributionDays": [
+                { "date": "2026-09-08", "contributionCount": 2 },
+                { "date": "2026-09-07", "contributionCount": 5 },
+                { "date": "2026-08-01", "contributionCount": 6 }
+              ]
+            }
+          ]
+        }
+      },
+      "repositories": {
+        "nodes": [
+          {
+            "name": "typescript-city",
+            "description": "A TypeScript city project",
+            "url": "https://github.com/octocat/typescript-city",
+            "stargazerCount": 5,
+            "pushedAt": "2026-10-07T12:00:00Z",
+            "primaryLanguage": { "name": "TypeScript", "color": "#3178c6" },
+            "defaultBranchRef": { "target": { "history": { "totalCount": 120 } } }
+          },
+          {
+            "name": "java-garden",
+            "description": null,
+            "url": "https://github.com/octocat/java-garden",
+            "stargazerCount": 0,
+            "pushedAt": "2026-09-20T08:30:00Z",
+            "primaryLanguage": { "name": "Java", "color": "#b07219" },
+            "defaultBranchRef": { "target": { "history": { "totalCount": 0 } } }
+          },
+          {
+            "name": "empty-solar",
+            "description": "No language or default branch",
+            "url": "https://github.com/octocat/empty-solar",
+            "stargazerCount": 12,
+            "pushedAt": "2025-12-31T23:59:59Z",
+            "primaryLanguage": null,
+            "defaultBranchRef": null
+          }
+        ]
+      }
+    }
+  }
+}

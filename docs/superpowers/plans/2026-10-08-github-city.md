@@ -68,14 +68,14 @@ vercel.json                   rewrite SPA
 
 **Files:** Create: todo el esqueleto Vite, `vercel.json`, `.gitignore`, `.env.example`
 
-- [ ] **Step 1:** `npm create vite@latest . -- --template react-ts` en la raíz del repo (ya existe `docs/`; conservarlo).
-- [ ] **Step 2:** `npm i three @react-three/fiber @react-three/drei @react-three/postprocessing react-router-dom` y `npm i -D vitest @types/three @vercel/node vercel`.
-- [ ] **Step 3:** Añadir script `"test": "vitest run"`. Crear `.env.example` con `GITHUB_TOKEN=` y asegurar `.env*` (salvo `.env.example`) en `.gitignore`.
-- [ ] **Step 4:** `vercel.json`: `{ "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }] }`.
-- [ ] **Step 5:** Verificar: `npm run build` sin errores y `npm test` (sin tests aún: "No test files found" es aceptable; añadir `passWithNoTests: true` en la config de Vitest).
-- [ ] **Step 6:** Commit `chore: scaffolding Vite + R3F + Vitest`.
+- [x] **Step 1:** `npm create vite@latest . -- --template react-ts` en la raíz del repo (ya existe `docs/`; conservarlo).
+- [x] **Step 2:** `npm i three @react-three/fiber @react-three/drei @react-three/postprocessing react-router-dom` y `npm i -D vitest @types/three @vercel/node vercel`.
+- [x] **Step 3:** Añadir script `"test": "vitest run"`. Crear `.env.example` con `GITHUB_TOKEN=` y asegurar `.env*` (salvo `.env.example`) en `.gitignore`.
+- [x] **Step 4:** `vercel.json`: `{ "rewrites": [{ "source": "/((?!api/).*)", "destination": "/index.html" }] }`.
+- [x] **Step 5:** Verificar: `npm run build` sin errores y `npm test` (sin tests aún: "No test files found" es aceptable; añadir `passWithNoTests: true` en la config de Vitest).
+- [x] **Step 6:** Commit `chore: scaffolding Vite + R3F + Vitest`.
 
-- [ ] **👤 Paso manual:** Crear un *fine-grained personal access token* en GitHub (Settings → Developer settings), solo acceso de lectura a repos públicos, y guardarlo en `.env.local` como `GITHUB_TOKEN=...`. No pegarlo en el chat.
+- [x] **👤 Paso manual:** Crear un *fine-grained personal access token* en GitHub (Settings → Developer settings), solo acceso de lectura a repos públicos, y guardarlo en `.env.local` como `GITHUB_TOKEN=...`. No pegarlo en el chat.
 
 ### Task 2: Transformador de GitHub (TDD)
 
@@ -101,16 +101,16 @@ export function errorFromGithub(status: number, json: unknown): ApiErrorCode;
 
 `CITY_QUERY` (variable `$login`): `user(login:$login){ login name avatarUrl contributionsCollection{ contributionCalendar{ totalContributions weeks{ contributionDays{ date contributionCount }}}} repositories(first:100, ownerAffiliations:OWNER, isFork:false, privacy:PUBLIC, orderBy:{field:PUSHED_AT, direction:DESC}){ nodes{ name description url stargazerCount pushedAt primaryLanguage{ name color } defaultBranchRef{ target{ ... on Commit { history{ totalCount }}}}}}}`.
 
-- [ ] **Step 1: Fixture.** `github-response.json` con forma `{ data: { user: {...} } }`: 3 repos — uno TypeScript con 120 commits y 5 estrellas, uno Java sin estrellas, uno con `primaryLanguage: null` y `defaultBranchRef: null`. Calendario con días dentro y fuera de los últimos 30 días respecto a `now = 2026-10-08T00:00:00Z`.
-- [ ] **Step 2: Tests que fallan** en `github.test.ts`:
+- [x] **Step 1: Fixture.** `github-response.json` con forma `{ data: { user: {...} } }`: 3 repos — uno TypeScript con 120 commits y 5 estrellas, uno Java sin estrellas, uno con `primaryLanguage: null` y `defaultBranchRef: null`. Calendario con días dentro y fuera de los últimos 30 días respecto a `now = 2026-10-08T00:00:00Z`.
+- [x] **Step 2: Tests que fallan** en `github.test.ts`:
   - `isValidUsername`: `true` para `"miquel-manzano"`, `"a"`, 39 caracteres; `false` para `""`, 40 caracteres, `"a b"`, `"a_b"`, `"../x"`.
   - `transformGithubResponse(fixture, now)`: devuelve 3 repos con `stars`, `commits`, `language`, `languageColor`, `lastPush` mapeados; el repo con `defaultBranchRef: null` tiene `commits === 0` y `language === null`; `activity.totalContributions` igual al del calendario; `activity.last30Days` = suma de días con `date` > `now - 30 días`.
   - `{ data: { user: null } }` → lanza con mensaje `USER_NOT_FOUND` (cubre organizaciones).
   - `errorFromGithub`: `403` o `429` → `RATE_LIMITED`; `500` → `UPSTREAM_ERROR`; `200` con `errors[0].type === 'NOT_FOUND'` → `USER_NOT_FOUND`.
-- [ ] **Step 3:** `npm test` → FAIL (funciones no definidas).
-- [ ] **Step 4:** Implementar `types.ts` y `github.ts`.
-- [ ] **Step 5:** `npm test` → PASS.
-- [ ] **Step 6:** Commit `feat: transformador de respuesta de GitHub`.
+- [x] **Step 3:** `npm test` → FAIL (funciones no definidas).
+- [x] **Step 4:** Implementar `types.ts` y `github.ts`.
+- [x] **Step 5:** `npm test` → PASS.
+- [x] **Step 6:** Commit `feat: transformador de respuesta de GitHub`.
 
 ### Task 2b: Handler serverless
 
