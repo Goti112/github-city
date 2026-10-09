@@ -118,12 +118,12 @@ export function errorFromGithub(status: number, json: unknown): ApiErrorCode;
 
 **Interfaces — Consumes:** `CITY_QUERY`, `isValidUsername`, `transformGithubResponse`, `errorFromGithub` (Task 2). **Produces:** `GET /api/city/:user` → `200 CityResponse` | `{ error: ApiErrorCode }` con los status de Global Constraints.
 
-- [ ] **Step 1:** Handler `@vercel/node`: `user = String(req.query.user).trim()`; si `!isValidUsername` → 400. `POST https://api.github.com/graphql` con `Authorization: bearer ${process.env.GITHUB_TOKEN}` y `User-Agent: github-city`. Si `!res.ok` o `json.errors` → `errorFromGithub`. Si no, `transformGithubResponse(json, new Date())`; capturar `USER_NOT_FOUND` → 404; cualquier otra excepción → 502. Respuesta 200 con la cabecera `Cache-Control` de Global Constraints; errores 404 con `s-maxage=300`; 429/502 sin caché.
-- [ ] **Step 2: Verificar** con `npx vercel dev` (primera vez pide login/enlace del proyecto → **👤 Paso manual**):
+- [x] **Step 1:** Handler `@vercel/node`: `user = String(req.query.user).trim()`; si `!isValidUsername` → 400. `POST https://api.github.com/graphql` con `Authorization: bearer ${process.env.GITHUB_TOKEN}` y `User-Agent: github-city`. Si `!res.ok` o `json.errors` → `errorFromGithub`. Si no, `transformGithubResponse(json, new Date())`; capturar `USER_NOT_FOUND` → 404; cualquier otra excepción → 502. Respuesta 200 con la cabecera `Cache-Control` de Global Constraints; errores 404 con `s-maxage=300`; 429/502 sin caché.
+- [x] **Step 2: Verificar** con `npx vercel dev` (primera vez pide login/enlace del proyecto → **👤 Paso manual**):
   - `curl localhost:3000/api/city/torvalds` → 200 con repos.
   - `curl localhost:3000/api/city/esteusuarionoexiste-xyz123` → 404 `USER_NOT_FOUND`.
   - `curl "localhost:3000/api/city/a_b"` → 400.
-- [ ] **Step 3:** Commit `feat: endpoint /api/city/:user`.
+- [x] **Step 3:** Commit `feat: endpoint /api/city/:user`.
 
 ✅ **Fin del día 1:** la API devuelve tus datos reales en local.
 
