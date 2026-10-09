@@ -130,11 +130,9 @@ const districtCells = (side: number): Array<[number, number]> => {
 }
 
 const colorForRepo = (repo: Repo): string => {
-  if (repo.language === null) {
-    return NEUTRAL_COLOR
-  }
+  // GitHub has no color for some languages (e.g. Lean), so fall back to neutral.
   if (repo.languageColor === null) {
-    throw new RangeError(`Repository ${repo.name} has language ${repo.language} without a color`)
+    return NEUTRAL_COLOR
   }
   return desaturate(repo.languageColor)
 }

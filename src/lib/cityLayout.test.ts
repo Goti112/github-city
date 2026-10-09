@@ -179,4 +179,11 @@ describe('cityLayout', () => {
     expect(buildings.every((building) => building.district === OTHER_DISTRICT)).toBe(true)
     expect(buildings.every((building) => building.color === NEUTRAL_COLOR)).toBe(true)
   })
+
+  it('keeps the language district but uses the neutral color when GitHub has no color for it', () => {
+    const [building] = cityLayout([makeRepo(0, { language: 'Lean', languageColor: null })], now)
+
+    expect(building?.district).toBe('Lean')
+    expect(building?.color).toBe(NEUTRAL_COLOR)
+  })
 })
