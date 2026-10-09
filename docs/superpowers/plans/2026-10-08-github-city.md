@@ -299,7 +299,7 @@ export function lightingAt(t: number): Lighting; // t ∈ [0,1]: 0 = día, 0.5 =
 **Files:** Create `src/ui/SearchBar.tsx`; Modify `src/pages/Home.tsx`
 
 - [ ] **Step 1:** `SearchBar`: input con placeholder "Escribe un usuario de GitHub"; al enviar, `trim()`; si `!isValidUsername` muestra "Ese nombre de usuario no es válido" y no navega; si es válido, `navigate('/ciudad/' + user)`.
-- [ ] **Step 2:** `Home`: `CityScene` de fondo con autorrotación lenta (datos de `miquel-manzano` o, si falla, un layout de ejemplo generado localmente), título, `SearchBar` y 3 ejemplos clicables (el usuario de Miquel + 2 devs conocidos, p. ej. `torvalds`, `gaearon`).
+- [ ] **Step 2:** `Home`: `CityScene` de fondo con autorrotación lenta (ciudad de demostración generada localmente), título, `SearchBar` y 3 ejemplos clicables (el usuario real de GitHub de Miquel, pendiente de confirmar, + 2 devs conocidos, p. ej. `torvalds`, `gaearon`).
 - [ ] **Step 3: Verificar:** `" torvalds "` navega a `/ciudad/torvalds`; `"a b"` muestra el error.
 - [ ] **Step 4:** Commit `feat: Home con buscador`.
 

@@ -12,7 +12,6 @@ type ExampleProfile = {
 }
 
 const exampleProfiles: ExampleProfile[] = [
-  { login: 'miquel-manzano', name: 'Miquel' },
   { login: 'torvalds', name: 'Linus Torvalds' },
   { login: 'gaearon', name: 'Dan Abramov' },
 ]
