@@ -197,9 +197,9 @@ export async function fetchCity(user: string, fetchImpl: typeof fetch): Promise<
 
 **Interfaces — Produces:** `CityPage` lee `:user`, llama a `fetchCity`, calcula `useMemo(() => cityLayout(data.repos, new Date()))` y pasa `buildings: Building[]` y `user` a `CityScene`. Estado: `{ status: 'loading' } | { status: 'error', code: ApiErrorCode } | { status: 'ok', data: CityResponse }`.
 
-- [ ] **Step 1:** Router con `/`, `/ciudad/:user`, `*` → NotFound.
-- [ ] **Step 2:** `CityPage` con el estado anterior (pantallas de carga/error provisionales con texto).
-- [ ] **Step 3:** Commit `feat: rutas y CityPage`.
+- [x] **Step 1:** Router con `/`, `/ciudad/:user`, `*` → NotFound.
+- [x] **Step 2:** `CityPage` con el estado anterior (pantallas de carga/error provisionales con texto).
+- [x] **Step 3:** Commit `feat: rutas y CityPage`.
 
 ### Task 6: Escena con edificios instanciados
 
