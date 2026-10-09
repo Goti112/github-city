@@ -3,6 +3,7 @@ import type { ThreeEvent } from '@react-three/fiber'
 import { BoxGeometry, Color, InstancedMesh, MeshStandardMaterial, Object3D } from 'three'
 import type { Building } from '../lib/types'
 import type { PointerPosition } from '../ui/Tooltip'
+import { isClickGesture } from './isClickGesture'
 
 type BuildingsProps = {
   buildings: Building[]
@@ -73,7 +74,7 @@ const Buildings = ({ buildings, hovered, onHover, onSelect }: BuildingsProps): R
   }, [onHover])
 
   const handleClick = useCallback((event: ThreeEvent<MouseEvent>): void => {
-    if (event.instanceId === undefined) {
+    if (event.instanceId === undefined || !isClickGesture(event.delta)) {
       return
     }
 

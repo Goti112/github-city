@@ -22,7 +22,7 @@ const UserCard = ({ user, repositoryCount, totalContributions }: UserCardProps):
           <dd>{numberFormat.format(repositoryCount)}</dd>
         </div>
         <div>
-          <dt>Contribuciones este año</dt>
+          <dt>Contribuciones del último año</dt>
           <dd>{numberFormat.format(totalContributions)}</dd>
         </div>
       </dl>

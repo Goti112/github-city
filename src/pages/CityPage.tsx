@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
-import { useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { CityError, fetchCity } from '../lib/api'
 import { cityLayout } from '../lib/cityLayout'
 import type { ApiErrorCode, CityResponse, Repo } from '../lib/types'
@@ -20,21 +20,22 @@ type RequestState = {
 }
 
 type InteractionState = {
-  user: string | undefined
   hoveredIndex: number | null
   pointerPosition: PointerPosition | null
   selectedRepo: Repo | null
 }
 
-const CityPage = (): ReactElement => {
-  const { user } = useParams()
+type CityPageContentProps = {
+  user: string | undefined
+}
+
+const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
   const [requestState, setRequestState] = useState<RequestState>(() => ({
     user,
     state: { status: 'loading' },
   }))
   const [now] = useState<Date>(() => new Date())
   const [interactionState, setInteractionState] = useState<InteractionState>(() => ({
-    user,
     hoveredIndex: null,
     pointerPosition: null,
     selectedRepo: null,
@@ -73,9 +74,7 @@ const CityPage = (): ReactElement => {
     () => data === null ? [] : cityLayout(data.repos, now),
     [data, now],
   )
-  const interaction: InteractionState = interactionState.user === user
-    ? interactionState
-    : { user, hoveredIndex: null, pointerPosition: null, selectedRepo: null }
+  const interaction = interactionState
 
   const handleHover = useCallback((
     hoveredIndex: number | null,
@@ -89,21 +88,18 @@ const CityPage = (): ReactElement => {
     }
 
     setInteractionState((current) => {
-      const selectedRepo = current.user === user ? current.selectedRepo : null
       const samePosition = current.pointerPosition?.x === pointerPosition?.x
         && current.pointerPosition?.y === pointerPosition?.y
       if (
-        current.user === user
-        && current.hoveredIndex === hoveredIndex
+        current.hoveredIndex === hoveredIndex
         && samePosition
-        && current.selectedRepo === selectedRepo
       ) {
         return current
       }
 
-      return { user, hoveredIndex, pointerPosition, selectedRepo }
+      return { ...current, hoveredIndex, pointerPosition }
     })
-  }, [buildings, user])
+  }, [buildings])
 
   const handleSelect = useCallback((index: number): void => {
     const building = buildings[index]
@@ -119,22 +115,12 @@ const CityPage = (): ReactElement => {
       throw new Error(`No se encontró el repositorio ${building.repoName} en los datos de @${user}`)
     }
 
-    setInteractionState((current) => ({
-      user,
-      hoveredIndex: current.user === user ? current.hoveredIndex : null,
-      pointerPosition: current.user === user ? current.pointerPosition : null,
-      selectedRepo: repo,
-    }))
+    setInteractionState((current) => ({ ...current, selectedRepo: repo }))
   }, [buildings, data, user])
 
   const handleCloseRepo = useCallback((): void => {
-    setInteractionState((current) => ({
-      user,
-      hoveredIndex: current.user === user ? current.hoveredIndex : null,
-      pointerPosition: current.user === user ? current.pointerPosition : null,
-      selectedRepo: null,
-    }))
-  }, [user])
+    setInteractionState((current) => ({ ...current, selectedRepo: null }))
+  }, [])
 
   const hoveredBuildingName = interaction.hoveredIndex === null
     ? null
@@ -178,6 +164,13 @@ const CityPage = (): ReactElement => {
       )}
     </main>
   )
+}
+
+const CityPage = (): ReactElement => {
+  const { user } = useParams()
+  const location = useLocation()
+
+  return <CityPageContent key={`${location.key}:${user ?? ''}`} user={user} />
 }
 
 export default CityPage
