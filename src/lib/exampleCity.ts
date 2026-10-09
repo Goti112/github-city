@@ -1,95 +1,57 @@
-import type { CityResponse } from './types'
+import type { CityResponse, Repo } from './types'
+
+// Decorative city for the Home background and loading screen. It is generated, not a real
+// profile, so nothing here is attributed to an actual GitHub user.
+const languages: Array<[string, string]> = [
+  ['TypeScript', '#3178c6'],
+  ['JavaScript', '#f1e05a'],
+  ['Python', '#3572A5'],
+  ['Java', '#b07219'],
+  ['Kotlin', '#A97BFF'],
+  ['Rust', '#dea584'],
+  ['Go', '#00ADD8'],
+  ['C#', '#178600'],
+]
+
+// Repos per language, biggest district first, so the demo has one large district and smaller ones around it.
+const districtSizes = [14, 10, 7, 6, 5, 4, 3, 3]
+
+// Small deterministic PRNG (mulberry32) so the demo looks identical on every visit.
+const random = (() => {
+  let seed = 20261008
+  return (): number => {
+    seed = (seed + 0x6d2b79f5) | 0
+    let value = Math.imul(seed ^ (seed >>> 15), 1 | seed)
+    value = (value + Math.imul(value ^ (value >>> 7), 61 | value)) ^ value
+    return ((value ^ (value >>> 14)) >>> 0) / 4294967296
+  }
+})()
+
+const millisecondsPerDay = 24 * 60 * 60 * 1000
+const builtAt = Date.now()
+
+const repos: Repo[] = languages.flatMap(([language, languageColor], languageIndex) =>
+  Array.from({ length: districtSizes[languageIndex] ?? 1 }, (_, index): Repo => {
+    const daysSincePush = Math.floor(random() ** 2 * 500)
+    return {
+      name: `${language.toLowerCase()}-${index + 1}`,
+      description: null,
+      url: 'https://github.com',
+      stars: Math.floor(random() ** 3 * 40),
+      language,
+      languageColor,
+      commits: Math.floor(random() ** 2 * 1500),
+      lastPush: new Date(builtAt - daysSincePush * millisecondsPerDay).toISOString(),
+    }
+  }),
+)
 
 export const EXAMPLE_CITY: CityResponse = {
   user: {
-    login: 'miquel-manzano',
-    name: 'Miquel Manzano',
+    login: 'github-city',
+    name: 'GitHub City',
     avatarUrl: '/avatar-placeholder.svg',
   },
-  repos: [
-    {
-      name: 'city-ui',
-      description: 'Componentes para explorar datos de forma visual.',
-      url: 'https://github.com/miquel-manzano/city-ui',
-      stars: 48,
-      language: 'TypeScript',
-      languageColor: '#3178c6',
-      commits: 120,
-      lastPush: '2026-10-08T12:00:00.000Z',
-    },
-    {
-      name: 'render-lab',
-      description: 'Experimentos con gráficos 3D en el navegador.',
-      url: 'https://github.com/miquel-manzano/render-lab',
-      stars: 6,
-      language: 'TypeScript',
-      languageColor: '#3178c6',
-      commits: 300,
-      lastPush: '2026-10-07T12:00:00.000Z',
-    },
-    {
-      name: 'graph-api',
-      description: 'Una API pequeña para proyectos personales.',
-      url: 'https://github.com/miquel-manzano/graph-api',
-      stars: 16,
-      language: 'Go',
-      languageColor: '#00add8',
-      commits: 80,
-      lastPush: '2026-10-04T12:00:00.000Z',
-    },
-    {
-      name: 'terminal-tool',
-      description: 'Atajos y utilidades para la terminal.',
-      url: 'https://github.com/miquel-manzano/terminal-tool',
-      stars: 8,
-      language: 'Rust',
-      languageColor: '#dea584',
-      commits: 19,
-      lastPush: '2026-09-29T12:00:00.000Z',
-    },
-    {
-      name: 'data-pipeline',
-      description: 'Procesamiento de datos con scripts reproducibles.',
-      url: 'https://github.com/miquel-manzano/data-pipeline',
-      stars: 5,
-      language: 'Python',
-      languageColor: '#3572a5',
-      commits: 56,
-      lastPush: '2026-09-22T12:00:00.000Z',
-    },
-    {
-      name: 'design-system',
-      description: 'Colores, tokens y estilos para prototipos rápidos.',
-      url: 'https://github.com/miquel-manzano/design-system',
-      stars: 13,
-      language: 'CSS',
-      languageColor: '#563d7c',
-      commits: 120,
-      lastPush: '2026-09-18T12:00:00.000Z',
-    },
-    {
-      name: 'repo-index',
-      description: 'Búsqueda ligera entre repositorios.',
-      url: 'https://github.com/miquel-manzano/repo-index',
-      stars: 0,
-      language: 'JavaScript',
-      languageColor: '#f1e05a',
-      commits: 0,
-      lastPush: '2026-09-10T12:00:00.000Z',
-    },
-    {
-      name: 'playground',
-      description: 'Pequeños prototipos sin un lenguaje principal.',
-      url: 'https://github.com/miquel-manzano/playground',
-      stars: 1,
-      language: null,
-      languageColor: null,
-      commits: 25,
-      lastPush: '2026-08-25T12:00:00.000Z',
-    },
-  ],
-  activity: {
-    totalContributions: 842,
-    last30Days: 71,
-  },
+  repos,
+  activity: { totalContributions: 0, last30Days: 0 },
 }

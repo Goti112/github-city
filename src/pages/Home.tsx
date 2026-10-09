@@ -1,9 +1,7 @@
-import { useEffect, useMemo, useState, type ReactElement } from 'react'
+import { useMemo, useState, type ReactElement } from 'react'
 import { Link } from 'react-router-dom'
-import { fetchCity } from '../lib/api'
 import { cityLayout } from '../lib/cityLayout'
 import { EXAMPLE_CITY } from '../lib/exampleCity'
-import type { CityResponse } from '../lib/types'
 import CityScene from '../scene/CityScene'
 import { SceneErrorBoundary } from '../ui/SceneErrorBoundary'
 import SearchBar from '../ui/SearchBar'
@@ -20,34 +18,13 @@ const exampleProfiles: ExampleProfile[] = [
 ]
 
 const Home = (): ReactElement => {
-  const [city, setCity] = useState<CityResponse>(EXAMPLE_CITY)
   const [now] = useState<Date>(() => new Date())
   const [sceneAttempt, setSceneAttempt] = useState<number>(0)
-  const buildings = useMemo(() => cityLayout(city.repos, now), [city, now])
+  // The background is a generated demo city: always busy, instant, and costs no API call.
+  const buildings = useMemo(() => cityLayout(EXAMPLE_CITY.repos, now), [now])
   const handleSceneRetry = (): void => {
     setSceneAttempt((current) => current + 1)
   }
-
-  useEffect(() => {
-    let isCurrentRequest = true
-
-    void fetchCity('miquel-manzano', fetch)
-      .then((response) => {
-        if (isCurrentRequest) {
-          setCity(response)
-        }
-      })
-      .catch((error: unknown) => {
-        console.warn('No se pudo cargar la ciudad de ejemplo; se mantiene el conjunto local', {
-          username: 'miquel-manzano',
-          error,
-        })
-      })
-
-    return () => {
-      isCurrentRequest = false
-    }
-  }, [])
 
   return (
     <main className="home-page">
@@ -62,7 +39,7 @@ const Home = (): ReactElement => {
       >
         <CityScene
           buildings={buildings}
-          avatarUrl={city.user.avatarUrl}
+          avatarUrl={EXAMPLE_CITY.user.avatarUrl}
           timeOfDay={0.72}
           hovered={null}
           autoRotateSpeed={0.16}
