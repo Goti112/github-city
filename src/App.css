@@ -73,6 +73,35 @@
   pointer-events: none;
 }
 
+.home-page__scene-error {
+  position: absolute;
+  z-index: 3;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  max-width: calc(100% - 40px);
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgba(255, 180, 168, 0.38);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(9, 16, 23, 0.92);
+  color: #ffd8d1;
+  font-size: 0.82rem;
+}
+
+.home-page__scene-error button {
+  flex: 0 0 auto;
+  border: 1px solid rgba(115, 224, 192, 0.55);
+  border-radius: 999px;
+  padding: 7px 10px;
+  background: rgba(115, 224, 192, 0.12);
+  color: #dffbf2;
+  cursor: pointer;
+  font-size: inherit;
+}
+
 .home-page__content {
   position: relative;
   z-index: 2;

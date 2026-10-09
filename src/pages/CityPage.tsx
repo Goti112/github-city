@@ -11,6 +11,8 @@ import StatusScreen from '../ui/StatusScreen'
 import Toolbar from '../ui/Toolbar'
 import Tooltip, { type PointerPosition } from '../ui/Tooltip'
 import UserCard from '../ui/UserCard'
+import { canvasForCapture } from '../ui/canvasForCapture'
+import { SceneErrorBoundary } from '../ui/SceneErrorBoundary'
 import NotFound, { UserNotFound } from './NotFound'
 
 type PageState =
@@ -47,6 +49,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
   const [timeOfDay, setTimeOfDay] = useState<number>(0.5)
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
   const [retryCount, setRetryCount] = useState<number>(0)
+  const [sceneAttempt, setSceneAttempt] = useState<number>(0)
   const loadingBuildings = useMemo(() => cityLayout(EXAMPLE_CITY.repos, now), [now])
 
   const handleToggleTime = useCallback((): void => {
@@ -56,9 +59,14 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
     setCanvas(nextCanvas)
   }, [])
   const handleRetry = useCallback((): void => {
+    setCanvas(null)
     setRequestState({ user, state: { status: 'loading' } })
     setRetryCount((current) => current + 1)
   }, [user])
+  const handleSceneRetry = useCallback((): void => {
+    setCanvas(null)
+    setSceneAttempt((current) => current + 1)
+  }, [])
 
   useEffect(() => {
     if (user === undefined) {
@@ -156,17 +164,26 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
   return (
     <main className={`city-page${interaction.hoveredIndex === null ? '' : ' city-page--hovered'}`}>
       {state.status === 'loading' && (
-        <>
-          <CityScene
-            buildings={loadingBuildings}
-            avatarUrl={EXAMPLE_CITY.user.avatarUrl}
-            timeOfDay={timeOfDay}
-            hovered={null}
-            onCanvasReady={handleCanvasReady}
-            autoRotateSpeed={0}
-          />
-          <StatusScreen role="status"><p>Levantando tu ciudad…</p></StatusScreen>
-        </>
+        <SceneErrorBoundary
+          key={`loading:${sceneAttempt}`}
+          fallback={(
+            <StatusScreen role="alert">
+              <p>La escena 3D no está disponible.</p>
+              <button type="button" onClick={handleSceneRetry}>Reintentar escena</button>
+            </StatusScreen>
+          )}
+        >
+          <>
+            <CityScene
+              buildings={loadingBuildings}
+              avatarUrl={EXAMPLE_CITY.user.avatarUrl}
+              timeOfDay={timeOfDay}
+              hovered={null}
+              autoRotateSpeed={0}
+            />
+            <StatusScreen role="status"><p>Levantando tu ciudad…</p></StatusScreen>
+          </>
+        </SceneErrorBoundary>
       )}
       {state.status === 'error' && (
         <StatusScreen role="alert">
@@ -181,17 +198,28 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
       )}
       {state.status === 'ok' && (
         <>
-          <CityScene
-            buildings={buildings}
-            avatarUrl={state.data.user.avatarUrl}
-            timeOfDay={timeOfDay}
-            hovered={interaction.hoveredIndex}
-            onHover={handleHover}
-            onSelect={handleSelect}
-            onCanvasReady={handleCanvasReady}
-            autoRotateSpeed={0}
-          />
-          <Toolbar canvas={canvas} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} />
+          <SceneErrorBoundary
+            key={`ready:${sceneAttempt}`}
+            onError={() => setCanvas(null)}
+            fallback={(
+              <StatusScreen role="alert">
+                <p>La escena 3D no está disponible.</p>
+                <button type="button" onClick={handleSceneRetry}>Reintentar escena</button>
+              </StatusScreen>
+            )}
+          >
+            <CityScene
+              buildings={buildings}
+              avatarUrl={state.data.user.avatarUrl}
+              timeOfDay={timeOfDay}
+              hovered={interaction.hoveredIndex}
+              onHover={handleHover}
+              onSelect={handleSelect}
+              onCanvasReady={handleCanvasReady}
+              autoRotateSpeed={0}
+            />
+          </SceneErrorBoundary>
+          <Toolbar canvas={canvasForCapture(state.status, canvas)} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} />
           {state.data.repos.length === 0 && (
             <StatusScreen role="status"><p>🚧 En obras: aún no hay repos públicos</p></StatusScreen>
           )}

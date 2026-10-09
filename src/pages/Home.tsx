@@ -5,6 +5,7 @@ import { cityLayout } from '../lib/cityLayout'
 import { EXAMPLE_CITY } from '../lib/exampleCity'
 import type { CityResponse } from '../lib/types'
 import CityScene from '../scene/CityScene'
+import { SceneErrorBoundary } from '../ui/SceneErrorBoundary'
 import SearchBar from '../ui/SearchBar'
 
 type ExampleProfile = {
@@ -21,7 +22,11 @@ const exampleProfiles: ExampleProfile[] = [
 const Home = (): ReactElement => {
   const [city, setCity] = useState<CityResponse>(EXAMPLE_CITY)
   const [now] = useState<Date>(() => new Date())
+  const [sceneAttempt, setSceneAttempt] = useState<number>(0)
   const buildings = useMemo(() => cityLayout(city.repos, now), [city, now])
+  const handleSceneRetry = (): void => {
+    setSceneAttempt((current) => current + 1)
+  }
 
   useEffect(() => {
     let isCurrentRequest = true
@@ -46,13 +51,23 @@ const Home = (): ReactElement => {
 
   return (
     <main className="home-page">
-      <CityScene
-        buildings={buildings}
-        avatarUrl={city.user.avatarUrl}
-        timeOfDay={0.72}
-        hovered={null}
-        autoRotateSpeed={0.16}
-      />
+      <SceneErrorBoundary
+        key={sceneAttempt}
+        fallback={(
+          <div className="home-page__scene-error" role="alert">
+            <span>La escena de ejemplo no está disponible. Puedes seguir buscando.</span>
+            <button type="button" onClick={handleSceneRetry}>Reintentar escena</button>
+          </div>
+        )}
+      >
+        <CityScene
+          buildings={buildings}
+          avatarUrl={city.user.avatarUrl}
+          timeOfDay={0.72}
+          hovered={null}
+          autoRotateSpeed={0.16}
+        />
+      </SceneErrorBoundary>
       <div className="home-page__overlay" aria-hidden="true" />
       <section className="home-page__content">
         <p className="home-page__eyebrow">GitHub City</p>
