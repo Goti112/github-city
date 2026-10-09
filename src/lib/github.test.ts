@@ -87,6 +87,10 @@ describe('errorFromGithub', () => {
     expect(errorFromGithub(200, { errors: [{ type: 'NOT_FOUND' }] })).toBe('USER_NOT_FOUND')
   })
 
+  it('maps a GraphQL RATE_LIMITED error on HTTP 200 to RATE_LIMITED', () => {
+    expect(errorFromGithub(200, { errors: [{ type: 'RATE_LIMITED' }] })).toBe('RATE_LIMITED')
+  })
+
   it('maps other GraphQL errors to UPSTREAM_ERROR', () => {
     expect(errorFromGithub(200, { errors: [{ type: 'VALIDATION' }] })).toBe('UPSTREAM_ERROR')
   })

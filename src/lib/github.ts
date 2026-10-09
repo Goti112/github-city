@@ -189,19 +189,20 @@ export const transformGithubResponse = (json: unknown, now: Date): CityResponse 
   }
 }
 
-const hasNotFoundError = (json: unknown): boolean => {
+const hasGraphQLErrorType = (json: unknown, type: string): boolean => {
   if (!isJsonRecord(json) || !Array.isArray(json.errors)) {
     return false
   }
 
-  return json.errors.some((error: unknown) => isJsonRecord(error) && error.type === 'NOT_FOUND')
+  return json.errors.some((error: unknown) => isJsonRecord(error) && error.type === type)
 }
 
 export const errorFromGithub = (status: number, json: unknown): ApiErrorCode => {
-  if (status === 403 || status === 429) {
+  // GraphQL reports an exhausted primary rate limit as HTTP 200 with a RATE_LIMITED error.
+  if (status === 403 || status === 429 || hasGraphQLErrorType(json, 'RATE_LIMITED')) {
     return 'RATE_LIMITED'
   }
-  if (status === 200 && hasNotFoundError(json)) {
+  if (status === 200 && hasGraphQLErrorType(json, 'NOT_FOUND')) {
     return 'USER_NOT_FOUND'
   }
   return 'UPSTREAM_ERROR'
