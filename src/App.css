@@ -226,6 +226,7 @@
   display: block;
   width: 100% !important;
   height: 100% !important;
+  touch-action: none;
 }
 
 .city-toolbar {
@@ -540,7 +541,7 @@
 
 @media (max-width: 600px) {
   .city-toolbar {
-    top: 12px;
+    top: 126px;
     right: 12px;
   }
 
@@ -552,6 +553,7 @@
   .user-card {
     top: 12px;
     left: 12px;
+    max-width: calc(100vw - 24px);
     gap: 10px;
     padding: 9px 12px;
   }
@@ -564,6 +566,20 @@
   .city-page__status {
     width: calc(100% - 40px);
     box-sizing: border-box;
+  }
+}
+
+@media (max-width: 420px) {
+  .user-card__stats {
+    gap: 8px;
+  }
+
+  .user-card__stats dt {
+    font-size: 0.66rem;
+  }
+
+  .user-card__stats dd {
+    font-size: 0.82rem;
   }
 }
 

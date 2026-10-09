@@ -50,6 +50,7 @@ const CityScene = ({
   return (
     <div className="city-scene" role="region" aria-label="Escena 3D de repositorios">
       <Canvas
+        dpr={[1, 2]}
         shadows
         gl={{ preserveDrawingBuffer: true }}
         camera={{ position: framing.position, fov: CAMERA_FOV }}

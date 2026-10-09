@@ -64,7 +64,7 @@ const Toolbar = ({ canvas, login, timeOfDay, onToggleTime }: ToolbarProps): Reac
   }, [login, showMessage])
 
   return (
-    <div className="city-toolbar" aria-label="Acciones de la ciudad">
+    <div className="city-toolbar" role="group" aria-label="Acciones de la ciudad">
       <button
         type="button"
         aria-label={isNight ? 'Cambiar a día' : 'Cambiar a noche'}
