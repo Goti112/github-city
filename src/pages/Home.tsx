@@ -12,6 +12,7 @@ type ExampleProfile = {
 }
 
 const exampleProfiles: ExampleProfile[] = [
+  { login: 'Goti112', name: 'Miquel' },
   { login: 'torvalds', name: 'Linus Torvalds' },
   { login: 'gaearon', name: 'Dan Abramov' },
 ]
