@@ -3,6 +3,7 @@ import type { Building, Repo } from './types'
 export const CELL = 3
 export const OTHER_DISTRICT = 'Otros'
 export const NEUTRAL_COLOR = '#8a8f98'
+export const PLAZA_RADIUS = 9
 
 const millisecondsPerDay = 24 * 60 * 60 * 1000
 const minimumLight = 0.05
@@ -129,6 +130,47 @@ const districtCells = (side: number): Array<[number, number]> => {
     .map(([x, z]): [number, number] => [x - centerOffset, z - centerOffset])
 }
 
+type Square = { x: number; z: number; half: number }
+
+const squaresOverlap = (left: Square, right: Square): boolean =>
+  Math.abs(left.x - right.x) < left.half + right.half
+  && Math.abs(left.z - right.z) < left.half + right.half
+
+const distanceToSquare = ({ x, z, half }: Square): number =>
+  Math.hypot(Math.max(Math.abs(x) - half, 0), Math.max(Math.abs(z) - half, 0))
+
+// Greedy packing: each district (largest first) takes the free grid point closest to the
+// plaza, so small districts fill the gaps around big ones instead of floating far away.
+const placeDistricts = (sides: number[]): Array<[number, number]> => {
+  // Half extent includes half a street on each side, so neighbouring districts keep a full street between them.
+  const halves = sides.map((side) => (side * CELL) / 2 + CELL / 2)
+  const totalArea = halves.reduce((sum, half) => sum + (2 * half) ** 2, 0)
+  const reach = Math.ceil((Math.sqrt(totalArea) * 2 + PLAZA_RADIUS * 2) / CELL) + 2
+  const candidates: Array<[number, number]> = []
+  for (let gridX = -reach; gridX <= reach; gridX += 1) {
+    for (let gridZ = -reach; gridZ <= reach; gridZ += 1) {
+      candidates.push([gridX * CELL, gridZ * CELL])
+    }
+  }
+  candidates.sort(([leftX, leftZ], [rightX, rightZ]) =>
+    Math.hypot(leftX, leftZ) - Math.hypot(rightX, rightZ)
+    || Math.atan2(leftZ, leftX) - Math.atan2(rightZ, rightX))
+
+  const placed: Square[] = []
+  return halves.map((half, index): [number, number] => {
+    // Even-sided districts have cells on half-CELL offsets; shift so plots stay on the street grid.
+    const offset = (sides[index] ?? 1) % 2 === 0 ? CELL / 2 : 0
+    for (const [candidateX, candidateZ] of candidates) {
+      const square = { x: candidateX + offset, z: candidateZ + offset, half }
+      if (distanceToSquare(square) + CELL / 2 >= PLAZA_RADIUS && !placed.some((other) => squaresOverlap(square, other))) {
+        placed.push(square)
+        return [square.x, square.z]
+      }
+    }
+    throw new Error(`No room for district ${index} within reach ${reach}`)
+  })
+}
+
 const colorForRepo = (repo: Repo): string => {
   // GitHub has no color for some languages (e.g. Lean), so fall back to neutral.
   if (repo.languageColor === null) {
@@ -156,14 +198,14 @@ export const cityLayout = (repos: Repo[], now: Date): Building[] => {
   const districts = Array.from(reposByDistrict.entries()).sort(([leftName, leftRepos], [rightName, rightRepos]) =>
     rightRepos.length - leftRepos.length || compareStrings(leftName, rightName),
   )
-  const largestSide = Math.max(...districts.map(([, districtRepos]) => Math.ceil(Math.sqrt(districtRepos.length))))
-  const slotSize = (largestSide + 1) * CELL
-  const districtSlots = spiral(districts.length + 1)
+  const districtCenters = placeDistricts(
+    districts.map(([, districtRepos]) => Math.ceil(Math.sqrt(districtRepos.length))),
+  )
 
   return districts.flatMap(([district, districtRepos], districtIndex) => {
-    const districtSlot = districtSlots[districtIndex + 1]
+    const districtSlot = districtCenters[districtIndex]
     if (districtSlot === undefined) {
-      throw new Error(`Missing district slot at index ${districtIndex + 1}`)
+      throw new Error(`Missing district center at index ${districtIndex}`)
     }
 
     const side = Math.ceil(Math.sqrt(districtRepos.length))
@@ -178,13 +220,13 @@ export const cityLayout = (repos: Repo[], now: Date): Building[] => {
         throw new Error(`Missing district cell for repository ${repo.name}`)
       }
 
-      const [slotX, slotZ] = districtSlot
+      const [centerX, centerZ] = districtSlot
       const [cellX, cellZ] = cell
       const size = plotSize(repo.stars)
       return {
         repoName: repo.name,
-        x: slotX * slotSize + cellX * CELL,
-        z: slotZ * slotSize + cellZ * CELL,
+        x: centerX + cellX * CELL,
+        z: centerZ + cellZ * CELL,
         width: size,
         depth: size,
         height: buildingHeight(repo.commits),

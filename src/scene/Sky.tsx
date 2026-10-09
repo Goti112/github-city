@@ -13,7 +13,8 @@ import { lightingAt } from './timeOfDay'
 
 type SkyProps = {
   timeOfDay: number
-  maxDistance: number
+  fogNear: number
+  fogFar: number
   windowGlow: WindowGlowUniform
 }
 
@@ -29,7 +30,7 @@ type BloomHandle = {
 
 const transitionDuration = 1.5
 
-const Sky = ({ timeOfDay, maxDistance, windowGlow }: SkyProps): ReactElement => {
+const Sky = ({ timeOfDay, fogNear, fogFar, windowGlow }: SkyProps): ReactElement => {
   const backgroundRef = useRef<Color | null>(null)
   const fogRef = useRef<Fog | null>(null)
   const ambientLightRef = useRef<AmbientLight | null>(null)
@@ -101,7 +102,9 @@ const Sky = ({ timeOfDay, maxDistance, windowGlow }: SkyProps): ReactElement => 
       <fog
         ref={fogRef}
         attach="fog"
-        args={[initialLighting.sky, maxDistance * 0.38, maxDistance * 1.25]}
+        args={[initialLighting.sky, fogNear, fogFar]}
+        near={fogNear}
+        far={fogFar}
       />
       <ambientLight ref={ambientLightRef} intensity={initialLighting.ambient} />
       <directionalLight

@@ -1,5 +1,6 @@
 import type { ReactElement } from 'react'
 import { useTexture } from '@react-three/drei'
+import { PLAZA_RADIUS } from '../lib/cityLayout'
 
 type GroundProps = {
   avatarUrl: string
@@ -29,7 +30,7 @@ const Ground = ({ avatarUrl }: GroundProps): ReactElement => (
       <meshStandardMaterial color="#111a22" roughness={0.96} />
     </mesh>
     <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.06, 0]} receiveShadow>
-      <circleGeometry args={[9, 64]} />
+      <circleGeometry args={[PLAZA_RADIUS, 64]} />
       <meshStandardMaterial color="#27333b" roughness={0.9} />
     </mesh>
     <AvatarSign avatarUrl={avatarUrl} />

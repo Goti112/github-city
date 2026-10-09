@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { Repo } from './types'
 import {
-  CELL,
   NEUTRAL_COLOR,
   OTHER_DISTRICT,
+  PLAZA_RADIUS,
   buildingHeight,
   cityLayout,
   desaturate,
@@ -109,17 +109,42 @@ describe('cityLayout', () => {
     }))
     const buildings = cityLayout(repos, now)
     const tallest = buildings.find((building) => building.repoName === 'repo-0')
-    const firstDistrictSlot = spiral(2)[1]
-
-    if (tallest === undefined || firstDistrictSlot === undefined) {
-      throw new Error('Expected the tallest building and first district slot to exist')
+    if (tallest === undefined) {
+      throw new Error('Expected the tallest building to exist')
     }
 
-    const slotSize = (3 + 1) * CELL
-    expect([tallest.x, tallest.z]).toEqual([
-      firstDistrictSlot[0] * slotSize,
-      firstDistrictSlot[1] * slotSize,
-    ])
+    const centroidX = buildings.reduce((sum, building) => sum + building.x, 0) / buildings.length
+    const centroidZ = buildings.reduce((sum, building) => sum + building.z, 0) / buildings.length
+    expect(tallest.x).toBeCloseTo(centroidX)
+    expect(tallest.z).toBeCloseTo(centroidZ)
+  })
+
+  it('keeps every plot outside the central plaza', () => {
+    const languages = ['TypeScript', 'Java', 'Rust', 'Go']
+    const repos = Array.from({ length: 40 }, (_, index) => makeRepo(index, {
+      language: languages[index % languages.length] ?? null,
+      stars: 20,
+    }))
+
+    for (const building of cityLayout(repos, now)) {
+      const nearestX = Math.max(Math.abs(building.x) - building.width / 2, 0)
+      const nearestZ = Math.max(Math.abs(building.z) - building.depth / 2, 0)
+      expect(Math.hypot(nearestX, nearestZ)).toBeGreaterThanOrEqual(PLAZA_RADIUS)
+    }
+  })
+
+  it('packs small districts close to the plaza next to a large one', () => {
+    const big = Array.from({ length: 36 }, (_, index) => makeRepo(index, { language: 'JavaScript' }))
+    const small = ['Rust', 'Go', 'Lean', 'Python', 'Ruby', 'C'].map((language, index) =>
+      makeRepo(100 + index, { language }))
+    const buildings = cityLayout([...big, ...small], now)
+    const bigRadius = Math.max(...buildings
+      .filter((building) => building.district === 'JavaScript')
+      .map((building) => Math.hypot(building.x, building.z)))
+
+    for (const building of buildings.filter((candidate) => candidate.district !== 'JavaScript')) {
+      expect(Math.hypot(building.x, building.z)).toBeLessThanOrEqual(bigRadius)
+    }
   })
 
   it('keeps 100 repositories in language districts without overlapping plots', () => {

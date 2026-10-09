@@ -1,9 +1,10 @@
-import { Suspense, useMemo, type ReactElement } from 'react'
+import { Suspense, useLayoutEffect, useMemo, type ReactElement } from 'react'
 import { OrbitControls } from '@react-three/drei'
-import { Canvas } from '@react-three/fiber'
+import { Canvas, useThree } from '@react-three/fiber'
 import type { Building } from '../lib/types'
 import type { PointerPosition } from '../ui/Tooltip'
 import Buildings from './Buildings'
+import { CAMERA_FOV, cameraFraming, type CameraFraming } from './cameraFraming'
 import Ground from './Ground'
 import Sky from './Sky'
 import { KEYFRAMES } from './timeOfDay'
@@ -18,11 +19,14 @@ type CitySceneProps = {
   onSelect: (index: number) => void
 }
 
-const cameraMaxDistance = (buildings: Building[]): number => {
-  const cityRadius = buildings.reduce((radius, building) =>
-    Math.max(radius, Math.hypot(building.x, building.z) + Math.max(building.width, building.depth)),
-  0)
-  return Math.max(80, cityRadius * 2.5)
+// R3F only reads the Canvas camera prop on mount, so re-frame when the city changes.
+const FrameCamera = ({ framing }: { framing: CameraFraming }): null => {
+  const camera = useThree((state) => state.camera)
+  useLayoutEffect(() => {
+    camera.position.set(...framing.position)
+    camera.lookAt(...framing.target)
+  }, [camera, framing])
+  return null
 }
 
 const CityScene = ({
@@ -33,7 +37,7 @@ const CityScene = ({
   onHover,
   onSelect,
 }: CitySceneProps): ReactElement => {
-  const maxDistance = cameraMaxDistance(buildings)
+  const framing = useMemo(() => cameraFraming(buildings), [buildings])
   const windowGlow = useMemo<WindowGlowUniform>(
     () => ({ value: KEYFRAMES.sunset.windowGlow }),
     [],
@@ -44,9 +48,15 @@ const CityScene = ({
       <Canvas
         shadows
         gl={{ preserveDrawingBuffer: true }}
-        camera={{ position: [40, 40, 40], fov: 45 }}
+        camera={{ position: framing.position, fov: CAMERA_FOV }}
       >
-        <Sky timeOfDay={timeOfDay} maxDistance={maxDistance} windowGlow={windowGlow} />
+        <FrameCamera framing={framing} />
+        <Sky
+          timeOfDay={timeOfDay}
+          fogNear={framing.fogNear}
+          fogFar={framing.fogFar}
+          windowGlow={windowGlow}
+        />
         <Suspense fallback={null}>
           <Ground avatarUrl={avatarUrl} />
         </Suspense>
@@ -58,10 +68,10 @@ const CityScene = ({
           onSelect={onSelect}
         />
         <OrbitControls
-          target={[0, 0, 0]}
+          target={framing.target}
           maxPolarAngle={Math.PI / 2.2}
           minDistance={10}
-          maxDistance={maxDistance}
+          maxDistance={framing.maxDistance}
           enableDamping
           dampingFactor={0.08}
         />
