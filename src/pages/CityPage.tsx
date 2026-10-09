@@ -1,14 +1,17 @@
 import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
-import { useLocation, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import { CityError, fetchCity } from '../lib/api'
 import { cityLayout } from '../lib/cityLayout'
+import { EXAMPLE_CITY } from '../lib/exampleCity'
 import type { ApiErrorCode, CityResponse, Repo } from '../lib/types'
 import CityScene from '../scene/CityScene'
 import RepoPanel from '../ui/RepoPanel'
+import SearchBar from '../ui/SearchBar'
+import StatusScreen from '../ui/StatusScreen'
 import Toolbar from '../ui/Toolbar'
 import Tooltip, { type PointerPosition } from '../ui/Tooltip'
 import UserCard from '../ui/UserCard'
-import NotFound from './NotFound'
+import NotFound, { UserNotFound } from './NotFound'
 
 type PageState =
   | { status: 'loading' }
@@ -43,6 +46,8 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
   }))
   const [timeOfDay, setTimeOfDay] = useState<number>(0.5)
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
+  const [retryCount, setRetryCount] = useState<number>(0)
+  const loadingBuildings = useMemo(() => cityLayout(EXAMPLE_CITY.repos, now), [now])
 
   const handleToggleTime = useCallback((): void => {
     setTimeOfDay((current) => current === 1 ? 0 : 1)
@@ -50,6 +55,10 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
   const handleCanvasReady = useCallback((nextCanvas: HTMLCanvasElement): void => {
     setCanvas(nextCanvas)
   }, [])
+  const handleRetry = useCallback((): void => {
+    setRequestState({ user, state: { status: 'loading' } })
+    setRetryCount((current) => current + 1)
+  }, [user])
 
   useEffect(() => {
     if (user === undefined) {
@@ -74,7 +83,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
     return () => {
       isCurrentRequest = false
     }
-  }, [user])
+  }, [retryCount, user])
 
   const state: PageState = requestState.user === user
     ? requestState.state
@@ -140,15 +149,35 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
     return <NotFound />
   }
 
+  if (state.status === 'error' && state.code === 'USER_NOT_FOUND') {
+    return <UserNotFound />
+  }
+
   return (
     <main className={`city-page${interaction.hoveredIndex === null ? '' : ' city-page--hovered'}`}>
       {state.status === 'loading' && (
-        <p className="city-page__status" role="status">Cargando la ciudad de @{user}…</p>
+        <>
+          <CityScene
+            buildings={loadingBuildings}
+            avatarUrl={EXAMPLE_CITY.user.avatarUrl}
+            timeOfDay={timeOfDay}
+            hovered={null}
+            onCanvasReady={handleCanvasReady}
+            autoRotateSpeed={0}
+          />
+          <StatusScreen role="status"><p>Levantando tu ciudad…</p></StatusScreen>
+        </>
       )}
       {state.status === 'error' && (
-        <p className="city-page__status" role="alert">
-          No se pudo cargar la ciudad de @{user}. Código: {state.code}
-        </p>
+        <StatusScreen role="alert">
+          {state.code === 'RATE_LIMITED' && <p>GitHub nos pide un respiro. Prueba en un minuto.</p>}
+          {state.code === 'UPSTREAM_ERROR' && <p>Algo ha fallado al hablar con GitHub.</p>}
+          {state.code === 'INVALID_USERNAME' && <p>Ese nombre de usuario no es válido.</p>}
+          {state.code === 'INVALID_USERNAME'
+            ? <SearchBar />
+            : <button type="button" onClick={handleRetry}>Reintentar</button>}
+          {state.code === 'INVALID_USERNAME' && <Link to="/">Volver al inicio</Link>}
+        </StatusScreen>
       )}
       {state.status === 'ok' && (
         <>
@@ -163,6 +192,9 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
             autoRotateSpeed={0}
           />
           <Toolbar canvas={canvas} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} />
+          {state.data.repos.length === 0 && (
+            <StatusScreen role="status"><p>🚧 En obras: aún no hay repos públicos</p></StatusScreen>
+          )}
           <UserCard
             user={state.data.user}
             repositoryCount={state.data.repos.length}
