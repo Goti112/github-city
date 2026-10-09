@@ -207,11 +207,12 @@ export async function fetchCity(user: string, fetchImpl: typeof fetch): Promise<
 
 **Interfaces — Produces:** `<CityScene buildings={Building[]} avatarUrl={string} />`; `<Buildings buildings onHover={(i: number|null)=>void} onSelect={(i: number)=>void} hovered={number|null} />` (se usan en Task 8).
 
-- [ ] **Step 1:** `CityScene`: `<Canvas shadows gl={{ preserveDrawingBuffer: true }} camera={{ position: [40, 40, 40], fov: 45 }}>`, luz ambiental + direccional, `OrbitControls` con `maxPolarAngle = Math.PI/2.2`, `minDistance 10`, `maxDistance` según extensión de la ciudad.
-- [ ] **Step 2:** `Buildings`: un `InstancedMesh` de `BoxGeometry(1,1,1)` con origen desplazado a la base; matriz por instancia con escala `(width, height, depth)` y posición `(x, height/2, z)`; color por instancia.
-- [ ] **Step 3:** `Ground`: plano de suelo oscuro + plaza central con el avatar como textura en un monolito/cartel.
+- [x] **Step 1:** `CityScene`: `<Canvas shadows gl={{ preserveDrawingBuffer: true }} camera={{ position: [40, 40, 40], fov: 45 }}>`, luz ambiental + direccional, `OrbitControls` con `maxPolarAngle = Math.PI/2.2`, `minDistance 10`, `maxDistance` según extensión de la ciudad.
+- [x] **Step 2:** `Buildings`: un `InstancedMesh` de `BoxGeometry(1,1,1)` con origen desplazado a la base; matriz por instancia con escala `(width, height, depth)` y posición `(x, height/2, z)`; color por instancia.
+- [x] **Step 3:** `Ground`: plano de suelo oscuro + plaza central con el avatar como textura en un monolito/cartel.
 - [ ] **Step 4: Verificar** con `npx vercel dev` → `/ciudad/<tu usuario>` muestra la ciudad y la cámara orbita. **👤 Paso manual:** mirarla y confirmar que se entiende.
-- [ ] **Step 5:** Commit `feat: escena 3D básica`.
+  - **Estado:** build y lint correctos; la CLI no pudo recuperar el proyecto por la red restringida y el navegador de Codex bloqueó la URL local, así que falta esta revisión visual.
+- [x] **Step 5:** Commit `feat: escena 3D básica`.
 
 ✅ **Fin del día 3:** ves tu ciudad en 3D.
 

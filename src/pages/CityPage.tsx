@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { CityError, fetchCity } from '../lib/api'
 import { cityLayout } from '../lib/cityLayout'
 import type { ApiErrorCode, CityResponse } from '../lib/types'
+import CityScene from '../scene/CityScene'
 import NotFound from './NotFound'
 
 type PageState =
@@ -72,14 +73,17 @@ const CityPage = (): ReactElement => {
         </p>
       )}
       {state.status === 'ok' && (
-        <section className="city-page__summary" aria-live="polite">
-          <img src={state.data.user.avatarUrl} alt="" />
-          <div>
-            <h1>{state.data.user.name ?? state.data.user.login}</h1>
-            <p>@{state.data.user.login}</p>
-            <p>{buildings.length} edificios preparados</p>
-          </div>
-        </section>
+        <>
+          <CityScene buildings={buildings} avatarUrl={state.data.user.avatarUrl} />
+          <section className="city-page__summary" aria-live="polite">
+            <img src={state.data.user.avatarUrl} alt="" />
+            <div>
+              <h1>{state.data.user.name ?? state.data.user.login}</h1>
+              <p>@{state.data.user.login}</p>
+              <p>{buildings.length} edificios</p>
+            </div>
+          </section>
+        </>
       )}
     </main>
   )
