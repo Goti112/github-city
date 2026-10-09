@@ -2,12 +2,16 @@ import { Suspense, type ReactElement } from 'react'
 import { OrbitControls } from '@react-three/drei'
 import { Canvas } from '@react-three/fiber'
 import type { Building } from '../lib/types'
+import type { PointerPosition } from '../ui/Tooltip'
 import Buildings from './Buildings'
 import Ground from './Ground'
 
 type CitySceneProps = {
   buildings: Building[]
   avatarUrl: string
+  hovered: number | null
+  onHover: (index: number | null, position: PointerPosition | null) => void
+  onSelect: (index: number) => void
 }
 
 const cameraMaxDistance = (buildings: Building[]): number => {
@@ -17,7 +21,13 @@ const cameraMaxDistance = (buildings: Building[]): number => {
   return Math.max(80, cityRadius * 2.5)
 }
 
-const CityScene = ({ buildings, avatarUrl }: CitySceneProps): ReactElement => {
+const CityScene = ({
+  buildings,
+  avatarUrl,
+  hovered,
+  onHover,
+  onSelect,
+}: CitySceneProps): ReactElement => {
   const maxDistance = cameraMaxDistance(buildings)
 
   return (
@@ -40,7 +50,12 @@ const CityScene = ({ buildings, avatarUrl }: CitySceneProps): ReactElement => {
         <Suspense fallback={null}>
           <Ground avatarUrl={avatarUrl} />
         </Suspense>
-        <Buildings buildings={buildings} />
+        <Buildings
+          buildings={buildings}
+          hovered={hovered}
+          onHover={onHover}
+          onSelect={onSelect}
+        />
         <OrbitControls
           target={[0, 0, 0]}
           maxPolarAngle={Math.PI / 2.2}

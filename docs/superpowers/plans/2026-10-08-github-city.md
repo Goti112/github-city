@@ -229,16 +229,17 @@ export async function fetchCity(user: string, fetchImpl: typeof fetch): Promise<
 - [x] **Step 1:** `UserCard` (arriba izquierda): avatar, nombre (o login), nº de repos, contribuciones del último año.
 - [x] **Step 2:** `RepoPanel({ repo, onClose })`: nombre, descripción, ⭐, lenguaje, commits, último push en formato relativo (`Intl.RelativeTimeFormat('es')`), botón "Ver en GitHub" (`target="_blank" rel="noopener"`). Lateral ≥ 768 px, *bottom sheet* por debajo. Cierra con Esc y con ×.
 - [x] **Step 3:** `Tooltip`: sigue al puntero y muestra el nombre del repo.
-- [ ] **Step 4:** Commit `feat: UserCard, RepoPanel y Tooltip`.
+- [x] **Step 4:** Commit `feat: UserCard, RepoPanel y Tooltip`.
 
 ### Task 8: Hover y clic sobre edificios
 
 **Files:** Modify `src/scene/Buildings.tsx`, `src/pages/CityPage.tsx`
 
-- [ ] **Step 1:** En `Buildings`, usar `event.instanceId` de `onPointerMove`/`onPointerOut`/`onClick` para llamar a `onHover`/`onSelect`; el edificio en hover se aclara (color de instancia) y el cursor pasa a `pointer`.
-- [ ] **Step 2:** `CityPage` guarda `hovered` y `selected`; enlaza el índice con el `Repo` vía `repoName`.
+- [x] **Step 1:** En `Buildings`, usar `event.instanceId` de `onPointerMove`/`onPointerOut`/`onClick` para llamar a `onHover`/`onSelect`; el edificio en hover se aclara (color de instancia) y el cursor pasa a `pointer`.
+- [x] **Step 2:** `CityPage` guarda `hovered` y `selected`; enlaza el índice con el `Repo` vía `repoName`.
 - [ ] **Step 3: Verificar** en navegador: hover resalta + tooltip; clic abre panel con datos correctos; Esc lo cierra.
-- [ ] **Step 4:** Commit `feat: interacción con edificios`.
+  - **Estado:** falta la comprobación manual en navegador; la política del navegador bloqueó la inspección de localhost en la revisión anterior, así que queda pendiente de tu revisión.
+- [x] **Step 4:** Commit `feat: interacción con edificios`.
 
 ✅ **Fin del día 4:** puedes explorar tus repos desde la ciudad.
 
