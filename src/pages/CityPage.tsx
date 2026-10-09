@@ -5,6 +5,7 @@ import { cityLayout } from '../lib/cityLayout'
 import type { ApiErrorCode, CityResponse, Repo } from '../lib/types'
 import CityScene from '../scene/CityScene'
 import RepoPanel from '../ui/RepoPanel'
+import Toolbar from '../ui/Toolbar'
 import Tooltip, { type PointerPosition } from '../ui/Tooltip'
 import UserCard from '../ui/UserCard'
 import NotFound from './NotFound'
@@ -29,12 +30,6 @@ type CityPageContentProps = {
   user: string | undefined
 }
 
-const lightingOptions = [
-  { value: 0, label: 'Día' },
-  { value: 0.5, label: 'Atardecer' },
-  { value: 1, label: 'Noche' },
-]
-
 const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
   const [requestState, setRequestState] = useState<RequestState>(() => ({
     user,
@@ -47,6 +42,14 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
     selectedRepo: null,
   }))
   const [timeOfDay, setTimeOfDay] = useState<number>(0.5)
+  const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
+
+  const handleToggleTime = useCallback((): void => {
+    setTimeOfDay((current) => current === 1 ? 0 : 1)
+  }, [])
+  const handleCanvasReady = useCallback((nextCanvas: HTMLCanvasElement): void => {
+    setCanvas(nextCanvas)
+  }, [])
 
   useEffect(() => {
     if (user === undefined) {
@@ -156,19 +159,9 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
             hovered={interaction.hoveredIndex}
             onHover={handleHover}
             onSelect={handleSelect}
+            onCanvasReady={handleCanvasReady}
           />
-          <div className="lighting-control" role="group" aria-label="Momento del día">
-            {lightingOptions.map(({ value, label }) => (
-              <button
-                key={value}
-                type="button"
-                aria-pressed={timeOfDay === value}
-                onClick={() => setTimeOfDay(value)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <Toolbar canvas={canvas} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} />
           <UserCard
             user={state.data.user}
             repositoryCount={state.data.repos.length}

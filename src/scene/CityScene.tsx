@@ -17,6 +17,7 @@ type CitySceneProps = {
   hovered: number | null
   onHover: (index: number | null, position: PointerPosition | null) => void
   onSelect: (index: number) => void
+  onCanvasReady?: (canvas: HTMLCanvasElement) => void
 }
 
 // R3F only reads the Canvas camera prop on mount, so re-frame when the city changes.
@@ -36,6 +37,7 @@ const CityScene = ({
   hovered,
   onHover,
   onSelect,
+  onCanvasReady,
 }: CitySceneProps): ReactElement => {
   const framing = useMemo(() => cameraFraming(buildings), [buildings])
   const windowGlow = useMemo<WindowGlowUniform>(
@@ -49,6 +51,7 @@ const CityScene = ({
         shadows
         gl={{ preserveDrawingBuffer: true }}
         camera={{ position: framing.position, fov: CAMERA_FOV }}
+        onCreated={({ gl }) => onCanvasReady?.(gl.domElement)}
       >
         <FrameCamera framing={framing} />
         <Sky
