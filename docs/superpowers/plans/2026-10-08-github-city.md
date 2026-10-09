@@ -75,7 +75,7 @@ vercel.json                   rewrite SPA
 - [x] **Step 5:** Verificar: `npm run build` sin errores y `npm test` (sin tests aún: "No test files found" es aceptable; añadir `passWithNoTests: true` en la config de Vitest).
 - [x] **Step 6:** Commit `chore: scaffolding Vite + R3F + Vitest`.
 
-- [x] **👤 Paso manual:** Crear un *fine-grained personal access token* en GitHub (Settings → Developer settings), solo acceso de lectura a repos públicos, y guardarlo en `.env.local` como `GITHUB_TOKEN=...`. No pegarlo en el chat.
+- [x] **👤 Paso manual:** Crear un *fine-grained personal access token* en GitHub (Settings → Developer settings), solo acceso de lectura a repos públicos, y guardarlo en `.env` (no `.env.local`: `vercel dev` no lo lee) como `GITHUB_TOKEN=...`. No pegarlo en el chat.
 
 ### Task 2: Transformador de GitHub (TDD)
 
