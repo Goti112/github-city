@@ -6,7 +6,7 @@
   "devCommand": "vite --port $PORT",
   "rewrites": [
     {
-      "source": "/ciudad/:user",
+      "source": "/((?!api/|@|.*\\.).*)",
       "destination": "/index.html"
     }
   ]

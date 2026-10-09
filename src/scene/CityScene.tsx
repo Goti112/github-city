@@ -4,7 +4,7 @@ import { Canvas, useThree } from '@react-three/fiber'
 import type { Building } from '../lib/types'
 import type { PointerPosition } from '../ui/Tooltip'
 import Buildings from './Buildings'
-import { CAMERA_FOV, cameraFraming, type CameraFraming } from './cameraFraming'
+import { CAMERA_FOV, cameraFraming } from './cameraFraming'
 import Ground from './Ground'
 import Sky from './Sky'
 import { KEYFRAMES } from './timeOfDay'
@@ -21,14 +21,46 @@ type CitySceneProps = {
   autoRotateSpeed: number
 }
 
-// R3F only reads the Canvas camera prop on mount, so re-frame when the city changes.
-const FrameCamera = ({ framing }: { framing: CameraFraming }): null => {
+type CityRigProps = {
+  buildings: Building[]
+  timeOfDay: number
+  windowGlow: WindowGlowUniform
+  autoRotateSpeed: number
+}
+
+// Camera, lighting and controls all depend on the framing, which needs the canvas aspect ratio,
+// so they live inside the Canvas where useThree can read it.
+const CityRig = ({ buildings, timeOfDay, windowGlow, autoRotateSpeed }: CityRigProps): ReactElement => {
   const camera = useThree((state) => state.camera)
+  const aspect = useThree((state) => state.size.width / Math.max(state.size.height, 1))
+  const framing = useMemo(() => cameraFraming(buildings, aspect), [buildings, aspect])
+
+  // R3F only reads the Canvas camera prop on mount, so re-frame when the city or screen changes.
   useLayoutEffect(() => {
     camera.position.set(...framing.position)
     camera.lookAt(...framing.target)
   }, [camera, framing])
-  return null
+
+  return (
+    <>
+      <Sky
+        timeOfDay={timeOfDay}
+        fogNear={framing.fogNear}
+        fogFar={framing.fogFar}
+        windowGlow={windowGlow}
+      />
+      <OrbitControls
+        target={framing.target}
+        maxPolarAngle={Math.PI / 2.2}
+        minDistance={10}
+        maxDistance={framing.maxDistance}
+        autoRotate={autoRotateSpeed > 0}
+        autoRotateSpeed={autoRotateSpeed}
+        enableDamping
+        dampingFactor={0.08}
+      />
+    </>
+  )
 }
 
 const CityScene = ({
@@ -41,7 +73,6 @@ const CityScene = ({
   onCanvasReady,
   autoRotateSpeed,
 }: CitySceneProps): ReactElement => {
-  const framing = useMemo(() => cameraFraming(buildings), [buildings])
   const windowGlow = useMemo<WindowGlowUniform>(
     () => ({ value: KEYFRAMES.sunset.windowGlow }),
     [],
@@ -53,15 +84,14 @@ const CityScene = ({
         dpr={[1, 2]}
         shadows
         gl={{ preserveDrawingBuffer: true }}
-        camera={{ position: framing.position, fov: CAMERA_FOV }}
+        camera={{ fov: CAMERA_FOV }}
         onCreated={({ gl }) => onCanvasReady?.(gl.domElement)}
       >
-        <FrameCamera framing={framing} />
-        <Sky
+        <CityRig
+          buildings={buildings}
           timeOfDay={timeOfDay}
-          fogNear={framing.fogNear}
-          fogFar={framing.fogFar}
           windowGlow={windowGlow}
+          autoRotateSpeed={autoRotateSpeed}
         />
         <Suspense fallback={null}>
           <Ground avatarUrl={avatarUrl} />
@@ -72,16 +102,6 @@ const CityScene = ({
           hovered={hovered}
           onHover={onHover}
           onSelect={onSelect}
-        />
-        <OrbitControls
-          target={framing.target}
-          maxPolarAngle={Math.PI / 2.2}
-          minDistance={10}
-          maxDistance={framing.maxDistance}
-          autoRotate={autoRotateSpeed > 0}
-          autoRotateSpeed={autoRotateSpeed}
-          enableDamping
-          dampingFactor={0.08}
         />
       </Canvas>
     </div>

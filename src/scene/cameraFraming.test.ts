@@ -50,6 +50,16 @@ describe('cameraFraming', () => {
     }
   })
 
+  it('backs off on portrait screens so the city fits horizontally', () => {
+    const buildings = [makeBuilding(40, 0, 5)]
+    const landscape = cameraFraming(buildings, 16 / 9)
+    const portrait = cameraFraming(buildings, 375 / 812)
+    const halfHorizontalFov = Math.atan(Math.tan(halfFov) * (375 / 812))
+
+    expect(Math.hypot(...portrait.position)).toBeGreaterThan(Math.hypot(...landscape.position))
+    expect(Math.hypot(...portrait.position) * Math.sin(halfHorizontalFov)).toBeGreaterThanOrEqual(41)
+  })
+
   it('grows with the size of the city', () => {
     const small = cameraFraming([makeBuilding(12, 0, 5)])
     const big = cameraFraming([makeBuilding(80, 80, 5)])

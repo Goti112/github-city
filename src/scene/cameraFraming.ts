@@ -20,7 +20,7 @@ const viewDirection = (() => {
 // Margin so the city does not touch the screen edges (and survives portrait aspect ratios).
 const framingMargin = 1.05
 
-export const cameraFraming = (buildings: Building[]): CameraFraming => {
+export const cameraFraming = (buildings: Building[], aspect = 1): CameraFraming => {
   const groundRadius = buildings.reduce(
     (radius, building) =>
       Math.max(radius, Math.hypot(building.x, building.z) + Math.max(building.width, building.depth) / 2),
@@ -31,7 +31,10 @@ export const cameraFraming = (buildings: Building[]): CameraFraming => {
   const targetY = tallest / 4
   // Bounding sphere around the target that contains the ground footprint and the tallest roof.
   const sphereRadius = Math.hypot(groundRadius, tallest - targetY)
-  const distance = (sphereRadius / Math.sin((CAMERA_FOV / 2) * (Math.PI / 180))) * framingMargin
+  // The fov is vertical; on portrait screens the horizontal half-angle is the narrower one.
+  const halfVerticalFov = (CAMERA_FOV / 2) * (Math.PI / 180)
+  const halfFov = Math.min(halfVerticalFov, Math.atan(Math.tan(halfVerticalFov) * aspect))
+  const distance = (sphereRadius / Math.sin(halfFov)) * framingMargin
 
   return {
     position: [

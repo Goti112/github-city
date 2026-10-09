@@ -552,7 +552,6 @@
   position: fixed;
   z-index: 5;
   max-width: min(260px, calc(100vw - 24px));
-  transform: translate(14px, 14px);
   border: 1px solid rgba(191, 221, 225, 0.2);
   border-radius: 8px;
   padding: 7px 10px;
@@ -569,9 +568,20 @@
 }
 
 @media (max-width: 600px) {
+  /* The user card wraps to a variable height on phones, so the toolbar moves to the bottom (thumb reach). */
   .city-toolbar {
-    top: 126px;
-    right: 12px;
+    top: auto;
+    right: auto;
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .city-toolbar__message {
+    top: auto;
+    right: 50%;
+    bottom: calc(100% + 10px);
+    transform: translateX(50%);
   }
 
   .city-toolbar button {

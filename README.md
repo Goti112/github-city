@@ -36,7 +36,7 @@ flowchart LR
     Layout --> Scene[CityScene: cámara, luz y edificios instanciados]
 ```
 
-La función valida el nombre de usuario, consulta los repositorios públicos propios y transforma la respuesta en `CityResponse`. Las respuestas correctas usan `s-maxage=3600, stale-while-revalidate=86400`; los errores no se guardan en caché.
+La función valida el nombre de usuario, consulta los repositorios públicos propios y transforma la respuesta en `CityResponse`. Las respuestas correctas usan `s-maxage=3600, stale-while-revalidate=86400`; un usuario inexistente se cachea 5 minutos (`s-maxage=300`) y el resto de errores no se guardan en caché.
 
 ## Decisiones técnicas
 
