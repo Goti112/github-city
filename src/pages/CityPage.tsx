@@ -7,6 +7,7 @@ import { builtBy, timelineRange } from '../lib/timeline'
 import { EXAMPLE_CITY } from '../lib/exampleCity'
 import type { ApiErrorCode, CityResponse, Repo } from '../lib/types'
 import CityScene from '../scene/LazyCityScene'
+import CompareForm from '../ui/CompareForm'
 import RepoFinder from '../ui/RepoFinder'
 import Timeline from '../ui/Timeline'
 import RepoPanel from '../ui/RepoPanel'
@@ -167,6 +168,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
   }, [buildings, data, user])
 
   const [finderOpen, setFinderOpen] = useState(false)
+  const [duelOpen, setDuelOpen] = useState(false)
   const [visibleYear, setVisibleYear] = useState<number | null>(null)
   const range = useMemo(() => timelineRange(buildings, now), [buildings, now])
   const handleFinderSelect = useCallback((repo: Repo): void => {
@@ -269,7 +271,13 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
               visibleYear={visibleYear}
             />
           </SceneErrorBoundary>
-          <Toolbar canvas={canvasForCapture(state.status, canvas)} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} onOpenFinder={() => setFinderOpen(true)} />
+          <Toolbar canvas={canvasForCapture(state.status, canvas)} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} onOpenFinder={() => setFinderOpen(true)} onOpenDuel={() => setDuelOpen((open) => !open)} />
+          {duelOpen && (
+            <div className="duel-popover" role="dialog" aria-label="Duelo de ciudades">
+              <p>Reta a otro perfil</p>
+              <CompareForm left={state.data.user.login} compact />
+            </div>
+          )}
           {range !== null && (
             <Timeline
               range={range}

@@ -1,16 +1,11 @@
-import { ImageResponse } from '@vercel/og'
-import { createElement as h, type CSSProperties, type ReactElement, type ReactNode } from 'react'
+import type { ReactNode } from 'react'
 import { cityStats } from '../../src/lib/cityStats.js'
 import { skylineBars } from '../../src/lib/skyline.js'
 import { loadCity } from '../_lib/loadCity.js'
+import { avatar, card, div, fallbackCard, footer, numberFormat } from '../_lib/ogParts.js'
 
 // Share card shown by LinkedIn / X / WhatsApp for /ciudad/:user links.
-const WIDTH = 1200
-const HEIGHT = 630
 const SKYLINE = { width: 560, height: 390 }
-const numberFormat = new Intl.NumberFormat('es')
-
-const div = (style: CSSProperties, ...children: ReactNode[]): ReactElement => h('div', { style }, ...children)
 
 const stat = (label: string, value: number): ReactNode => div(
   { display: 'flex', flexDirection: 'column', marginRight: 44 },
@@ -46,56 +41,24 @@ const building = (bar: ReturnType<typeof skylineBars>[number]): ReactNode => {
   )
 }
 
-const card = (title: string, children: ReactNode): ImageResponse => new ImageResponse(
-  div(
-    {
-      width: WIDTH,
-      height: HEIGHT,
-      display: 'flex',
-      position: 'relative',
-      background: 'linear-gradient(180deg, #050b14 0%, #0a1422 55%, #15263a 100%)',
-      fontFamily: 'sans-serif',
-      color: '#f3f7fa',
-    },
-    children,
-  ),
-  {
-    width: WIDTH,
-    height: HEIGHT,
-    headers: {
-      'Cache-Control': title === 'fallback' ? 'public, s-maxage=300' : 'public, s-maxage=86400, stale-while-revalidate=604800',
-    },
-  },
-)
-
-const footer = (): ReactNode => div(
-  { position: 'absolute', left: 64, bottom: 44, fontSize: 24, color: '#73e0c0', display: 'flex' },
-  'city.miquelmanzano.com',
-)
-
 export const GET = async (request: Request): Promise<Response> => {
   const login = new URL(request.url).pathname.split('/').pop() ?? ''
   const result = await loadCity(decodeURIComponent(login))
 
   if (!result.ok) {
-    return card('fallback', div(
-      { display: 'flex', flexDirection: 'column', padding: 64, justifyContent: 'center' },
-      div({ fontSize: 26, color: '#73e0c0', letterSpacing: 4 }, 'GITHUB CITY'),
-      div({ fontSize: 76, fontWeight: 700, marginTop: 12 }, 'Un perfil. Una ciudad.'),
-      footer(),
-    ))
+    return fallbackCard()
   }
 
   const { city } = result
   const stats = cityStats(city.repos, new Date())
   const bars = skylineBars(city.repos, SKYLINE, 16)
 
-  return card(city.user.login, [
+  return card(true, [
     div(
       { display: 'flex', flexDirection: 'column', padding: '64px 0 0 64px', width: 600 },
       div({ fontSize: 24, color: '#73e0c0', letterSpacing: 4, display: 'flex' }, `GITHUB CITY · ${stats.title.toUpperCase()}`),
       div({ display: 'flex', alignItems: 'center', marginTop: 26 },
-        h('img', { src: city.user.avatarUrl, width: 96, height: 96, style: { borderRadius: 48, marginRight: 24 } }),
+        div({ display: 'flex', marginRight: 24 }, avatar(city.user.avatarUrl, 96)),
         div({ display: 'flex', flexDirection: 'column' },
           div({ fontSize: 56, fontWeight: 700, lineHeight: 1.05 }, city.user.name ?? city.user.login),
           div({ fontSize: 28, color: '#8fa3b1', marginTop: 6 }, `@${city.user.login}`),

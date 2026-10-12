@@ -4,6 +4,7 @@ import { cityLayout } from '../lib/cityLayout'
 import { EXAMPLE_CITY } from '../lib/exampleCity'
 import CityScene from '../scene/LazyCityScene'
 import { SceneErrorBoundary } from '../ui/SceneErrorBoundary'
+import CompareForm from '../ui/CompareForm'
 import SearchBar from '../ui/SearchBar'
 
 type ExampleProfile = {
@@ -59,6 +60,10 @@ const Home = (): ReactElement => {
           {exampleProfiles.map(({ login, name }) => (
             <Link key={login} to={`/ciudad/${login}`}>{name}</Link>
           ))}
+        </div>
+        <div className="home-page__duel">
+          <span>¿O prefieres un duelo?</span>
+          <CompareForm />
         </div>
       </section>
     </main>

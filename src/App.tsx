@@ -2,6 +2,7 @@ import type { ReactElement } from 'react'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import './App.css'
 import CityPage from './pages/CityPage'
+import ComparePage from './pages/ComparePage'
 import Home from './pages/Home'
 import NotFound from './pages/NotFound'
 
@@ -10,6 +11,7 @@ const App = (): ReactElement => (
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/ciudad/:user" element={<CityPage />} />
+      <Route path="/vs/:left/:right" element={<ComparePage />} />
       <Route path="*" element={<NotFound />} />
     </Routes>
   </BrowserRouter>

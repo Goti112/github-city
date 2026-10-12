@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { personalizeHtml } from './shareMeta'
+import { personalizeDuelHtml, personalizeHtml } from './shareMeta'
 
 const html = `<head>
 <meta property="og:title" content="GitHub City" />
@@ -25,5 +25,19 @@ describe('personalizeHtml', () => {
 
   it('leaves the page untouched for an invalid username', () => {
     expect(personalizeHtml(html, '"><script>alert(1)</script>', origin)).toBe(html)
+  })
+})
+
+describe('personalizeDuelHtml', () => {
+  it('points the share card at the duel image and page', () => {
+    const result = personalizeDuelHtml(html, 'gaearon', 'Goti112', origin)
+
+    expect(result).toContain('<title>@gaearon vs @Goti112 · Duelo de ciudades · GitHub City</title>')
+    expect(result).toContain('content="https://city.miquelmanzano.com/api/og-duel?a=gaearon&amp;b=Goti112"')
+    expect(result).toContain('content="https://city.miquelmanzano.com/vs/gaearon/Goti112"')
+  })
+
+  it('leaves the page untouched if either username is invalid', () => {
+    expect(personalizeDuelHtml(html, 'gaearon', '<x>', origin)).toBe(html)
   })
 })
