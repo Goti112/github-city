@@ -1,87 +1,84 @@
 # GitHub City
 
-Convierte los repositorios públicos de cualquier perfil de GitHub en una ciudad 3D. La altura de cada edificio representa su actividad de desarrollo; sus ventanas muestran si el repositorio sigue activo.
+[![CI](https://github.com/Goti112/github-city/actions/workflows/ci.yml/badge.svg)](https://github.com/Goti112/github-city/actions/workflows/ci.yml)
+[![Demo](https://img.shields.io/badge/demo-city.miquelmanzano.com-73e0c0)](https://city.miquelmanzano.com)
 
-![Ilustración genérica de presentación de GitHub City](public/og.png)
+**Convierte cualquier perfil de GitHub en una ciudad 3D que puedes recorrer.**
+Cada repositorio es un edificio; los commits lo hacen crecer, la actividad reciente enciende sus ventanas y cada lenguaje forma su propio barrio.
 
-**Demo:** [city.miquelmanzano.com](https://city.miquelmanzano.com)
+👉 **[Prueba con tu usuario en city.miquelmanzano.com](https://city.miquelmanzano.com)**
 
-La imagen de cabecera es una ilustración genérica para compartir el proyecto. La captura real de una ciudad se descarga desde la barra de herramientas de la aplicación.
+![Ciudad de noche generada a partir de un perfil de GitHub](docs/screenshots/city-night.jpg)
 
-## Funciones
+## Qué hace
 
-- Busca perfiles públicos o abre una de las ciudades de ejemplo.
-- Gira y acerca la ciudad; selecciona un edificio para abrir los datos de su repositorio.
-- Cambia entre día y noche, descarga una captura PNG con marca de agua y copia el enlace de la ciudad.
-- Muestra estados para la carga, usuarios inexistentes, perfiles sin repositorios, límites de GitHub y errores de red.
-- Adapta el panel del repositorio a un panel inferior en pantallas pequeñas.
+- **Vuelo de cámara cinematográfico** al entrar, mientras cae la noche sobre la ciudad.
+- **Ciudad viva:** calles iluminadas, tráfico de luces, balizas en los tejados de los repos con estrellas y un edificio emblemático con haz de luz.
+- **Tu ciudad en cifras:** de *Aldea* a *Metrópolis* según tus repos, con habitantes (commits), distritos, edificios encendidos, estrellas, tu rascacielos y tu barrio principal.
+- **Explora:** gira, acerca y selecciona cualquier edificio para ver su repositorio.
+- **Comparte:** cada `/ciudad/:usuario` tiene su propia tarjeta de vista previa para LinkedIn, X o WhatsApp, generada al vuelo con su skyline. También puedes descargar una captura PNG.
+- Día, atardecer y noche; diseño adaptado a móvil; estados propios para usuarios inexistentes, perfiles vacíos y límites de GitHub.
 
-## Stack
+<img src="docs/screenshots/share-card.png" alt="Tarjeta de vista previa generada para un perfil" width="600" />
 
-- React, TypeScript y Vite.
-- React Three Fiber, Three.js y Drei para la escena 3D; postprocesado con Bloom.
-- React Router para las rutas `/` y `/ciudad/:user`.
-- Función serverless de Vercel y API GraphQL de GitHub.
-- Vitest para la lógica pura y Oxlint para lint.
+## De datos a ciudad
+
+| Dato de GitHub | En la ciudad |
+| --- | --- |
+| Commits de la rama principal | Altura: `1 + log2(commits + 1) × 1.5` (logarítmica, para que un repo enorme no aplaste al resto) |
+| Estrellas | Tamaño de la parcela y baliza roja en el tejado |
+| Lenguaje principal | Barrio y color de neón del edificio |
+| Último push | Ventanas encendidas: todas si fue hace ≤ 30 días, casi ninguna pasado un año |
+| Repo con más estrellas | Edificio emblemático con haz de luz |
+
+Los barrios se empaquetan de forma voraz alrededor de una plaza central con tu avatar, del más grande al más pequeño, y las calles discurren entre parcelas.
 
 ## Arquitectura
 
 ```mermaid
 flowchart LR
-    Browser[React en el navegador] -->|GET /api/city/:user| Handler[Vercel: api/city/:user]
-    Handler -->|consulta GraphQL| GitHub[GitHub GraphQL API]
-    GitHub --> Handler
-    Handler -->|CityResponse y caché HTTP| Browser
-    Browser --> Layout[cityLayout: repos a edificios]
-    Layout --> Scene[CityScene: cámara, luz y edificios instanciados]
+    Browser[React + React Three Fiber] -->|GET /api/city/:user| City[Función: api/city]
+    Crawler[LinkedIn / X / WhatsApp] -->|GET /ciudad/:user| MW[Middleware: meta Open Graph]
+    Crawler -->|GET /api/og/:user| OG[Función: api/og · @vercel/og]
+    City --> Load[api/_lib/loadCity]
+    OG --> Load
+    Load -->|1 consulta GraphQL| GitHub[GitHub GraphQL API]
+    Browser --> Layout[cityLayout · cityStats]
+    Layout --> Scene[Escena: instancing + shaders]
 ```
 
-La función valida el nombre de usuario, consulta los repositorios públicos propios y transforma la respuesta en `CityResponse`. Las respuestas correctas usan `s-maxage=3600, stale-while-revalidate=86400`; un usuario inexistente se cachea 5 minutos (`s-maxage=300`) y el resto de errores no se guardan en caché.
+- **Una sola consulta GraphQL** por perfil (perfil, 100 repos y calendario de contribuciones) desde una función serverless; el token nunca llega al navegador.
+- **Caché en el edge:** `s-maxage=3600, stale-while-revalidate=86400`; un usuario inexistente se cachea 5 minutos y el resto de errores no se cachean. Las tarjetas de vista previa se cachean un día.
+- **Vistas previas dinámicas:** los robots de las redes sociales no ejecutan JavaScript, así que un middleware sirve `/ciudad/:usuario` con las etiquetas Open Graph de ese usuario y `/api/og/:usuario` dibuja la tarjeta con `@vercel/og`.
 
 ## Decisiones técnicas
 
-- `cityLayout` y el transformador de GitHub son funciones puras: mapean datos a edificios sin modificar su entrada. La suite cubre altura logarítmica, tamaño de parcelas, antigüedad, agrupación por lenguaje y solapamientos.
-- La altura crece con `1 + log2(commits + 1) * 1.5`; las estrellas determinan el tamaño de la parcela y la fecha del último push controla la luz de las ventanas.
-- Los repositorios se dibujan con `InstancedMesh` para reducir llamadas de dibujo. Las ventanas se calculan en el shader, sin añadir geometría por ventana.
-- La escena admite hasta 100 repositorios públicos propios por consulta. Los forks se excluyen; los repositorios archivados se conservan y se atenúan según su actividad.
-- El token `GITHUB_TOKEN` solo se usa en el servidor. Nunca se envía al navegador ni se guarda en Git.
-- La API distingue nombres inválidos, usuarios inexistentes, rate limits y errores de GitHub/red. Las respuestas correctas se cachean durante una hora y pueden servirse durante un día mientras se actualizan.
+- **Lógica pura y testeada:** el transformador de GitHub, el layout de la ciudad, las cifras, el skyline de la tarjeta, el encuadre de cámara, el tráfico y las etiquetas de compartir son funciones puras con tests (Vitest, 79 tests).
+- **Rendimiento:** todos los edificios se dibujan con un único `InstancedMesh`; ventanas, coronas de neón y calles se calculan en shaders, sin geometría extra. La escena 3D se carga bajo demanda: el bundle inicial pesa ~200 kB y Three.js llega aparte.
+- **Cámara adaptativa:** el encuadre y la niebla se calculan a partir del tamaño de la ciudad, su edificio más alto y la proporción de la pantalla, así que una ciudad de 5 repos y una de 100 se ven enteras, también en vertical.
+- **Accesibilidad:** el vuelo de cámara se omite con `prefers-reduced-motion`; buscador, barra de herramientas y panel son controles HTML accesibles con teclado (Esc cierra el panel del repositorio).
+- **Robustez:** reintentos ante errores transitorios de GitHub, detección del rate limit de GraphQL (que llega como HTTP 200) y `api/` comprobado con la resolución de módulos de Node ESM para que los fallos de importación salgan en CI y no en producción.
+
+## Stack
+
+React 18 · TypeScript · Vite · React Three Fiber · Drei · postprocessing · React Router · Vercel Functions y Routing Middleware · `@vercel/og` · GitHub GraphQL API · Vitest · Oxlint · GitHub Actions
 
 ## Ejecutar en local
 
-Necesitas Node.js y npm. Para que la función `/api/city/:user` esté disponible, ejecuta el proyecto con Vercel CLI.
+```bash
+npm install
+cp .env.example .env   # añade GITHUB_TOKEN=... (token de GitHub con lectura de repos públicos)
+npm start              # vercel dev: front + funciones + middleware en http://localhost:3000
+```
 
-1. Instala las dependencias:
-
-   ```bash
-   npm install
-   ```
-
-2. Copia `.env.example` a `.env` y añade un token de GitHub con lectura de repositorios públicos. En PowerShell:
-
-   ```powershell
-   Copy-Item .env.example .env
-   ```
-
-   Añade `GITHUB_TOKEN=...` a `.env`. El archivo está ignorado por Git; no compartas el token ni lo incluyas en el frontend.
-
-3. Inicia Vercel Dev:
-
-   ```bash
-   npm run start
-   ```
-
-   Abre la dirección local que muestre Vercel. La primera ejecución puede pedir iniciar sesión y vincular el proyecto en Vercel.
-
-`npm run dev` inicia solo Vite; para probar la API serverless local, usa `npm run start`.
-
-## Comprobaciones
+`npm run dev` levanta solo Vite, sin las funciones serverless.
 
 ```bash
+npm run lint   # oxlint + comprobación de tipos de api/ y middleware
 npm test
-npm run lint
 npm run build
 ```
 
-La revisión visual en escritorio y móvil, el rendimiento real con unos 100 repositorios y la comprobación del PNG descargado se hacen en el navegador.
+---
 
+Hecho por [Miquel Manzano](https://miquelmanzano.com).
