@@ -68,8 +68,9 @@
   z-index: 1;
   inset: 0;
   background:
-    radial-gradient(ellipse at 50% 52%, rgba(6, 13, 18, 0.58), rgba(6, 13, 18, 0.84) 75%),
-    linear-gradient(180deg, rgba(6, 13, 18, 0.18), rgba(6, 13, 18, 0.64));
+    /* Darken only behind the copy so the city stays visible around it. */
+    radial-gradient(ellipse 46% 40% at 50% 50%, rgba(6, 13, 18, 0.72), rgba(6, 13, 18, 0.12) 100%),
+    linear-gradient(180deg, rgba(6, 13, 18, 0.05) 60%, rgba(6, 13, 18, 0.55));
   pointer-events: none;
 }
 
