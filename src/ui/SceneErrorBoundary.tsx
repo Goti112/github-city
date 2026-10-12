@@ -1,4 +1,4 @@
-import { Component, type ErrorInfo, type ReactNode } from 'react'
+import { Component, Suspense, type ErrorInfo, type ReactNode } from 'react'
 
 type SceneErrorBoundaryProps = {
   children: ReactNode
@@ -23,6 +23,9 @@ export class SceneErrorBoundary extends Component<SceneErrorBoundaryProps, Scene
   }
 
   render(): ReactNode {
-    return this.state.error === null ? this.props.children : this.props.fallback
+    // Suspense covers the lazily loaded scene chunk; a failed download lands in the error fallback.
+    return this.state.error === null
+      ? <Suspense fallback={null}>{this.props.children}</Suspense>
+      : this.props.fallback
   }
 }

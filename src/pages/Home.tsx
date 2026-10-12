@@ -2,7 +2,7 @@ import { useMemo, useState, type ReactElement } from 'react'
 import { Link } from 'react-router-dom'
 import { cityLayout } from '../lib/cityLayout'
 import { EXAMPLE_CITY } from '../lib/exampleCity'
-import CityScene from '../scene/CityScene'
+import CityScene from '../scene/LazyCityScene'
 import { SceneErrorBoundary } from '../ui/SceneErrorBoundary'
 import SearchBar from '../ui/SearchBar'
 
