@@ -11,6 +11,7 @@ const makeRepo = (name: string, commits: number): Repo => ({
   languageColor: '#3178c6',
   commits,
   lastPush: '2026-10-01T00:00:00.000Z',
+  createdAt: '2020-01-01T00:00:00.000Z',
 })
 
 const box = { width: 600, height: 400 }

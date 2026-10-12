@@ -234,6 +234,7 @@ export const cityLayout = (repos: Repo[], now: Date): Building[] => {
         litRatio: litRatio(repo.lastPush, now),
         district,
         stars: repo.stars,
+        createdYear: new Date(repo.createdAt).getUTCFullYear(),
       }
     })
   })

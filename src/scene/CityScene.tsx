@@ -29,6 +29,8 @@ type CitySceneProps = {
   showLandmark?: boolean
   /** Index of the building the camera should fly to, or null for the overview. */
   focusIndex?: number | null
+  /** History slider: only repositories created up to this year are standing. */
+  visibleYear?: number | null
 }
 
 type CityRigProps = {
@@ -188,6 +190,7 @@ const CityScene = ({
   intro = false,
   showLandmark = true,
   focusIndex = null,
+  visibleYear = null,
 }: CitySceneProps): ReactElement => {
   const windowGlow = useMemo<WindowGlowUniform>(
     () => ({ value: KEYFRAMES.sunset.windowGlow }),
@@ -196,6 +199,10 @@ const CityScene = ({
   const radius = useMemo(() => cityRadius(buildings), [buildings])
   const landmarkIndex = useMemo(() => (showLandmark ? pickLandmark(buildings) : null), [buildings, showLandmark])
   const landmark = landmarkIndex === null ? undefined : buildings[landmarkIndex]
+  const standing = useMemo(
+    () => (visibleYear === null ? buildings : buildings.filter((building) => building.createdYear <= visibleYear)),
+    [buildings, visibleYear],
+  )
 
   return (
     <div className="city-scene" role="region" aria-label="Escena 3D de repositorios">
@@ -222,12 +229,15 @@ const CityScene = ({
           windowGlow={windowGlow}
           hovered={hovered}
           selected={focusIndex}
+          visibleYear={visibleYear}
           onHover={onHover}
           onSelect={onSelect}
         />
         <Traffic radius={radius} windowGlow={windowGlow} />
-        <Beacons buildings={buildings} windowGlow={windowGlow} />
-        {landmark !== undefined && <Landmark building={landmark} windowGlow={windowGlow} />}
+        <Beacons buildings={standing} windowGlow={windowGlow} />
+        {landmark !== undefined && (visibleYear === null || landmark.createdYear <= visibleYear) && (
+          <Landmark building={landmark} windowGlow={windowGlow} />
+        )}
       </Canvas>
     </div>
   )

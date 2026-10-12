@@ -24,6 +24,7 @@ const isRepo = (value: unknown): value is Repo => {
     && isNullableString(value.languageColor)
     && isFiniteNumber(value.commits)
     && typeof value.lastPush === 'string'
+    && typeof value.createdAt === 'string'
 }
 
 const isCityResponse = (value: unknown): value is CityResponse => {
@@ -62,6 +63,8 @@ const errorCodeFromStatus = (status: number): ApiErrorCode => {
 const errorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : String(error)
 
+export const CITY_API_VERSION = 2
+
 export class CityError extends Error {
   readonly code: ApiErrorCode
 
@@ -74,7 +77,8 @@ export class CityError extends Error {
 
 export const fetchCity = async (user: string, fetchImpl: typeof fetch): Promise<CityResponse> => {
   const normalizedUser = user.trim()
-  const url = `/api/city/${encodeURIComponent(normalizedUser)}`
+  // Bump CITY_API_VERSION whenever CityResponse changes shape, so edge-cached old payloads are bypassed.
+  const url = `/api/city/${encodeURIComponent(normalizedUser)}?v=${CITY_API_VERSION}`
 
   let response: Response
   try {

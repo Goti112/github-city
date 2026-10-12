@@ -63,6 +63,7 @@ const readRepo = (value: unknown): Repo => {
       : nullableString(primaryLanguage.color, 'repositories.nodes[].primaryLanguage.color'),
     commits: readCommits(repo.defaultBranchRef),
     lastPush: requireString(repo.pushedAt, 'repositories.nodes[].pushedAt'),
+    createdAt: requireString(repo.createdAt, 'repositories.nodes[].createdAt'),
   }
 }
 
@@ -129,6 +130,7 @@ export const CITY_QUERY = `
           url
           stargazerCount
           pushedAt
+          createdAt
           primaryLanguage {
             name
             color

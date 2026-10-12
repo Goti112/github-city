@@ -3,10 +3,12 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import { CityError, fetchCity } from '../lib/api'
 import { cityLayout } from '../lib/cityLayout'
 import { cityStats } from '../lib/cityStats'
+import { builtBy, timelineRange } from '../lib/timeline'
 import { EXAMPLE_CITY } from '../lib/exampleCity'
 import type { ApiErrorCode, CityResponse, Repo } from '../lib/types'
 import CityScene from '../scene/LazyCityScene'
 import RepoFinder from '../ui/RepoFinder'
+import Timeline from '../ui/Timeline'
 import RepoPanel from '../ui/RepoPanel'
 import SearchBar from '../ui/SearchBar'
 import StatusScreen from '../ui/StatusScreen'
@@ -165,6 +167,8 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
   }, [buildings, data, user])
 
   const [finderOpen, setFinderOpen] = useState(false)
+  const [visibleYear, setVisibleYear] = useState<number | null>(null)
+  const range = useMemo(() => timelineRange(buildings, now), [buildings, now])
   const handleFinderSelect = useCallback((repo: Repo): void => {
     setFinderOpen(false)
     setInteractionState((current) => ({ ...current, selectedRepo: repo }))
@@ -262,9 +266,19 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
               autoRotateSpeed={0}
               intro
               focusIndex={focusIndex === -1 ? null : focusIndex}
+              visibleYear={visibleYear}
             />
           </SceneErrorBoundary>
           <Toolbar canvas={canvasForCapture(state.status, canvas)} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} onOpenFinder={() => setFinderOpen(true)} />
+          {range !== null && (
+            <Timeline
+              range={range}
+              year={visibleYear}
+              builtCount={visibleYear === null ? buildings.length : builtBy(buildings, visibleYear)}
+              total={buildings.length}
+              onChange={setVisibleYear}
+            />
+          )}
           {finderOpen && (
             <RepoFinder repos={state.data.repos} onSelect={handleFinderSelect} onClose={() => setFinderOpen(false)} />
           )}

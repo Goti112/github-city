@@ -14,6 +14,7 @@ const makeBuilding = (overrides: Partial<Building>): Building => ({
   litRatio: 1,
   district: 'TypeScript',
   stars: 0,
+  createdYear: 2020,
   ...overrides,
 })
 

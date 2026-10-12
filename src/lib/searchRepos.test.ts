@@ -11,6 +11,7 @@ const makeRepo = (name: string, commits: number, language: string | null = 'Type
   languageColor: null,
   commits,
   lastPush: '2026-10-01T00:00:00.000Z',
+  createdAt: '2020-01-01T00:00:00.000Z',
 })
 
 const repos = [

@@ -13,6 +13,7 @@ const makeRepo = (overrides: Partial<Repo>): Repo => ({
   languageColor: '#3178c6',
   commits: 10,
   lastPush: '2026-10-01T00:00:00.000Z',
+  createdAt: '2020-01-01T00:00:00.000Z',
   ...overrides,
 })
 

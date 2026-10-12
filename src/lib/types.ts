@@ -7,6 +7,7 @@ export type Repo = {
   languageColor: string | null
   commits: number
   lastPush: string
+  createdAt: string
 }
 
 export type CityResponse = {
@@ -35,4 +36,5 @@ export type Building = {
   litRatio: number
   district: string
   stars: number
+  createdYear: number
 }

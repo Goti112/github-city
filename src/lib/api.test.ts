@@ -18,6 +18,7 @@ const city: CityResponse = {
       languageColor: '#3178c6',
       commits: 12,
       lastPush: '2026-10-08T00:00:00.000Z',
+      createdAt: '2020-01-01T00:00:00.000Z',
     },
   ],
   activity: {
@@ -87,6 +88,6 @@ describe('fetchCity', () => {
 
     await fetchCity(' torvalds/dev repo ', fetchImpl)
 
-    expect(requestedUrls).toEqual(['/api/city/torvalds%2Fdev%20repo'])
+    expect(requestedUrls).toEqual(['/api/city/torvalds%2Fdev%20repo?v=2'])
   })
 })

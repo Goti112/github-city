@@ -18,6 +18,8 @@ type BuildingsProps = {
   windowGlow: WindowGlowUniform
   hovered: number | null
   selected?: number | null
+  /** Only buildings created up to this year are standing; null shows the whole city. */
+  visibleYear?: number | null
   onHover?: (index: number | null, position: PointerPosition | null) => void
   onSelect?: (index: number) => void
 }
@@ -30,18 +32,24 @@ const Buildings = ({
   windowGlow,
   hovered,
   selected = null,
+  visibleYear = null,
   onHover,
   onSelect,
 }: BuildingsProps): ReactElement | null => {
   const meshRef = useRef<InstancedMesh | null>(null)
   const geometry = useMemo(() => new BoxGeometry(1, 1, 1), [])
   const transform = useMemo(() => new Object3D(), [])
-  const entranceElapsed = useRef(0)
+  // Per-building growth (0 = flat, 1 = full height), where it is heading, and how long to wait first.
+  const growth = useRef({ level: new Float32Array(0), goal: new Float32Array(0), wait: new Float32Array(0), settled: true })
   const maximumRadius = useMemo(
     () => buildings.reduce((radius, building) => Math.max(radius, Math.hypot(building.x, building.z)), 1),
     [buildings],
   )
   const material = useMemo(() => createWindowsMaterial(windowGlow), [windowGlow])
+  const isVisible = useCallback(
+    (building: Building): boolean => visibleYear === null || building.createdYear <= visibleYear,
+    [visibleYear],
+  )
 
   useLayoutEffect(() => {
     const mesh = meshRef.current
@@ -61,46 +69,65 @@ const Buildings = ({
       mesh.setMatrixAt(index, transform.matrix)
     })
 
-    entranceElapsed.current = 0
+    // Opening rise: everything grows from the centre outwards.
+    growth.current = {
+      level: new Float32Array(buildings.length),
+      goal: new Float32Array(buildings.map((building) => (isVisible(building) ? 1 : 0))),
+      wait: new Float32Array(buildings.map((building) => (Math.hypot(building.x, building.z) / maximumRadius) * maxEntranceDelay)),
+      settled: false,
+    }
     mesh.instanceMatrix.needsUpdate = true
     mesh.computeBoundingSphere()
-  }, [buildings, geometry, transform])
+    // isVisible is applied by the effect below when only the year changes.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [buildings, geometry, maximumRadius, transform])
+
+  // History slider: buildings created after the chosen year sink, the rest rise.
+  useLayoutEffect(() => {
+    const state = growth.current
+    buildings.forEach((building, index) => {
+      const goal = isVisible(building) ? 1 : 0
+      if (state.goal[index] !== goal) {
+        state.goal[index] = goal
+        state.wait[index] = Math.min(state.wait[index] ?? 0, 0.25)
+        state.settled = false
+      }
+    })
+  }, [buildings, isVisible])
 
   useFrame((_, delta): void => {
-    const totalDuration = entranceDuration + maxEntranceDelay
-    if (entranceElapsed.current >= totalDuration) {
-      return
-    }
-
     const mesh = meshRef.current
-    if (mesh === null) {
+    const state = growth.current
+    if (mesh === null || state.settled) {
       return
     }
 
-    entranceElapsed.current = Math.min(entranceElapsed.current + delta, totalDuration)
-    let isAnimating = false
-
+    const step = Math.min(delta, 0.05) / entranceDuration
+    let moving = false
     buildings.forEach((building, index) => {
-      const distanceRatio = Math.hypot(building.x, building.z) / maximumRadius
-      const delay = distanceRatio * maxEntranceDelay
-      const rawProgress = Math.max(
-        0,
-        Math.min((entranceElapsed.current - delay) / entranceDuration, 1),
-      )
-      const easedProgress = 1 - (1 - rawProgress) ** 3
-      isAnimating ||= rawProgress < 1
+      const wait = state.wait[index] ?? 0
+      const goal = state.goal[index] ?? 1
+      let level = state.level[index] ?? 0
+      if (wait > 0) {
+        state.wait[index] = wait - Math.min(delta, 0.05)
+        moving = true
+      } else if (level !== goal) {
+        level = goal > level ? Math.min(level + step, goal) : Math.max(level - step * 1.6, goal)
+        state.level[index] = level
+        moving = true
+      }
 
-      transform.position.set(building.x, building.height * easedProgress / 2, building.z)
-      transform.scale.set(building.width, building.height * easedProgress, building.depth)
+      const eased = 1 - (1 - level) ** 3
+      transform.position.set(building.x, (building.height * eased) / 2, building.z)
+      // Keep a sliver of height so a sunk building never becomes a degenerate (zero-scale) matrix.
+      transform.scale.set(building.width, Math.max(building.height * eased, 0.0001), building.depth)
       transform.updateMatrix()
       mesh.setMatrixAt(index, transform.matrix)
     })
 
     mesh.instanceMatrix.needsUpdate = true
     mesh.computeBoundingSphere()
-    if (!isAnimating) {
-      entranceElapsed.current = totalDuration
-    }
+    state.settled = !moving
   })
 
   useLayoutEffect(() => {

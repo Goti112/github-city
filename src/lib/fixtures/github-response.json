@@ -32,6 +32,7 @@
             "url": "https://github.com/octocat/typescript-city",
             "stargazerCount": 5,
             "pushedAt": "2026-10-07T12:00:00Z",
+            "createdAt": "2020-03-14T10:00:00Z",
             "primaryLanguage": { "name": "TypeScript", "color": "#3178c6" },
             "defaultBranchRef": { "target": { "history": { "totalCount": 120 } } }
           },
@@ -41,6 +42,7 @@
             "url": "https://github.com/octocat/java-garden",
             "stargazerCount": 0,
             "pushedAt": "2026-09-20T08:30:00Z",
+            "createdAt": "2022-06-01T09:00:00Z",
             "primaryLanguage": { "name": "Java", "color": "#b07219" },
             "defaultBranchRef": { "target": { "history": { "totalCount": 0 } } }
           },
@@ -50,6 +52,7 @@
             "url": "https://github.com/octocat/empty-solar",
             "stargazerCount": 12,
             "pushedAt": "2025-12-31T23:59:59Z",
+            "createdAt": "2018-11-20T18:45:00Z",
             "primaryLanguage": null,
             "defaultBranchRef": null
           }

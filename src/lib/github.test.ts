@@ -40,6 +40,7 @@ describe('transformGithubResponse', () => {
           languageColor: '#3178c6',
           commits: 120,
           lastPush: '2026-10-07T12:00:00Z',
+          createdAt: '2020-03-14T10:00:00Z',
         },
         {
           name: 'java-garden',
@@ -50,6 +51,7 @@ describe('transformGithubResponse', () => {
           languageColor: '#b07219',
           commits: 0,
           lastPush: '2026-09-20T08:30:00Z',
+          createdAt: '2022-06-01T09:00:00Z',
         },
         {
           name: 'empty-solar',
@@ -60,6 +62,7 @@ describe('transformGithubResponse', () => {
           languageColor: null,
           commits: 0,
           lastPush: '2025-12-31T23:59:59Z',
+          createdAt: '2018-11-20T18:45:00Z',
         },
       ],
       activity: {

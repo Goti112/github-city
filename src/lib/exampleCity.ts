@@ -42,6 +42,7 @@ const repos: Repo[] = languages.flatMap(([language, languageColor], languageInde
       languageColor,
       commits: Math.floor(random() ** 2 * 1500),
       lastPush: new Date(builtAt - daysSincePush * millisecondsPerDay).toISOString(),
+      createdAt: new Date(builtAt - (daysSincePush + 60 + Math.floor(random() * 2200)) * millisecondsPerDay).toISOString(),
     }
   }),
 )
