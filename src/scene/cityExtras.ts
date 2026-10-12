@@ -53,3 +53,31 @@ export const introStartPosition = (end: Vector3, target: Vector3): Vector3 => {
     target[2] + Math.sin(heading) * horizontal,
   ]
 }
+
+export type CameraPose = { position: Vector3; target: Vector3 }
+
+// Close-up on one building, approached from the side the viewer is already looking from.
+export const focusPose = (building: Building, cameraPosition: Vector3, currentTarget: Vector3): CameraPose => {
+  const target: Vector3 = [building.x, building.height * 0.55, building.z]
+  const distance = Math.min(Math.max(building.height * 1.8 + 8, 12), 45)
+
+  let dirX = cameraPosition[0] - currentTarget[0]
+  let dirZ = cameraPosition[2] - currentTarget[2]
+  const horizontal = Math.hypot(dirX, dirZ)
+  if (horizontal < 1e-6) {
+    dirX = 1
+    dirZ = 1
+  }
+  const horizontalLength = Math.hypot(dirX, dirZ)
+  // Look slightly down on the building (~30°) whatever the current camera height is.
+  const elevation = Math.PI / 6
+  const flat = Math.cos(elevation) * distance
+  return {
+    target,
+    position: [
+      target[0] + (dirX / horizontalLength) * flat,
+      target[1] + Math.sin(elevation) * distance,
+      target[2] + (dirZ / horizontalLength) * flat,
+    ],
+  }
+}

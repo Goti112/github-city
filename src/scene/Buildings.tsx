@@ -17,6 +17,7 @@ type BuildingsProps = {
   buildings: Building[]
   windowGlow: WindowGlowUniform
   hovered: number | null
+  selected?: number | null
   onHover?: (index: number | null, position: PointerPosition | null) => void
   onSelect?: (index: number) => void
 }
@@ -28,6 +29,7 @@ const Buildings = ({
   buildings,
   windowGlow,
   hovered,
+  selected = null,
   onHover,
   onSelect,
 }: BuildingsProps): ReactElement | null => {
@@ -111,7 +113,10 @@ const Buildings = ({
     const highlightColor = new Color('#ffffff')
     buildings.forEach((building, index) => {
       const color = baseColor.set(building.color)
-      if (index === hovered) {
+      // The selected building stays lit up while its panel is open; hover is a lighter touch.
+      if (index === selected) {
+        color.lerp(highlightColor, 0.55)
+      } else if (index === hovered) {
         color.lerp(highlightColor, 0.35)
       }
       mesh.setColorAt(index, color)
@@ -120,7 +125,7 @@ const Buildings = ({
     if (mesh.instanceColor !== null) {
       mesh.instanceColor.needsUpdate = true
     }
-  }, [buildings, hovered])
+  }, [buildings, hovered, selected])
 
   const handlePointerMove = useCallback((event: ThreeEvent<PointerEvent>): void => {
     if (onHover === undefined || event.instanceId === undefined) {

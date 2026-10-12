@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { CELL, PLAZA_RADIUS } from '../lib/cityLayout'
 import type { Building } from '../lib/types'
-import { introStartPosition, pickLandmark, streetLines } from './cityExtras'
+import { focusPose, introStartPosition, pickLandmark, streetLines } from './cityExtras'
 
 const makeBuilding = (overrides: Partial<Building>): Building => ({
   repoName: 'repo',
@@ -74,5 +74,40 @@ describe('introStartPosition', () => {
   it('never starts inside the plaza even for tiny cities', () => {
     const start = introStartPosition([1, 1, 1], [0, 0, 0])
     expect(Math.hypot(...start)).toBeGreaterThan(PLAZA_RADIUS)
+  })
+})
+
+describe('focusPose', () => {
+  const building = makeBuilding({ x: 20, z: -6, height: 12 })
+
+  it('looks at the selected building', () => {
+    const pose = focusPose(building, [60, 50, 60], [0, 2, 0])
+    expect(pose.target[0]).toBe(20)
+    expect(pose.target[2]).toBe(-6)
+    expect(pose.target[1]).toBeGreaterThan(0)
+    expect(pose.target[1]).toBeLessThan(12)
+  })
+
+  it('stays a sensible distance away and above the ground', () => {
+    const pose = focusPose(building, [60, 50, 60], [0, 2, 0])
+    const distance = Math.hypot(
+      pose.position[0] - pose.target[0],
+      pose.position[1] - pose.target[1],
+      pose.position[2] - pose.target[2],
+    )
+    expect(distance).toBeGreaterThanOrEqual(12)
+    expect(distance).toBeLessThanOrEqual(45)
+    expect(pose.position[1]).toBeGreaterThan(pose.target[1])
+  })
+
+  it('approaches from the side the viewer was already looking from', () => {
+    const pose = focusPose(building, [60, 50, 60], [0, 2, 0])
+    const dot = (pose.position[0] - pose.target[0]) * 60 + (pose.position[2] - pose.target[2]) * 60
+    expect(dot).toBeGreaterThan(0)
+  })
+
+  it('copes with a camera straight above its target', () => {
+    const pose = focusPose(building, [0, 80, 0], [0, 0, 0])
+    expect(pose.position.every(Number.isFinite)).toBe(true)
   })
 })

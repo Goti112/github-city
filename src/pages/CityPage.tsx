@@ -6,6 +6,7 @@ import { cityStats } from '../lib/cityStats'
 import { EXAMPLE_CITY } from '../lib/exampleCity'
 import type { ApiErrorCode, CityResponse, Repo } from '../lib/types'
 import CityScene from '../scene/LazyCityScene'
+import RepoFinder from '../ui/RepoFinder'
 import RepoPanel from '../ui/RepoPanel'
 import SearchBar from '../ui/SearchBar'
 import StatusScreen from '../ui/StatusScreen'
@@ -163,9 +164,32 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
     setInteractionState((current) => ({ ...current, selectedRepo: repo }))
   }, [buildings, data, user])
 
+  const [finderOpen, setFinderOpen] = useState(false)
+  const handleFinderSelect = useCallback((repo: Repo): void => {
+    setFinderOpen(false)
+    setInteractionState((current) => ({ ...current, selectedRepo: repo }))
+  }, [])
+
+  // "/" opens the building finder, like search on GitHub.
+  useEffect(() => {
+    const handleKey = (event: globalThis.KeyboardEvent): void => {
+      const typing = event.target instanceof HTMLElement && ['INPUT', 'TEXTAREA'].includes(event.target.tagName)
+      if (event.key === '/' && !typing && isReady) {
+        event.preventDefault()
+        setFinderOpen(true)
+      }
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [isReady])
+
   const handleCloseRepo = useCallback((): void => {
     setInteractionState((current) => ({ ...current, selectedRepo: null }))
   }, [])
+
+  const focusIndex = interaction.selectedRepo === null
+    ? null
+    : buildings.findIndex((building) => building.repoName === interaction.selectedRepo?.name)
 
   const hoveredBuildingName = interaction.hoveredIndex === null
     ? null
@@ -237,9 +261,13 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
               onCanvasReady={handleCanvasReady}
               autoRotateSpeed={0}
               intro
+              focusIndex={focusIndex === -1 ? null : focusIndex}
             />
           </SceneErrorBoundary>
-          <Toolbar canvas={canvasForCapture(state.status, canvas)} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} />
+          <Toolbar canvas={canvasForCapture(state.status, canvas)} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} onOpenFinder={() => setFinderOpen(true)} />
+          {finderOpen && (
+            <RepoFinder repos={state.data.repos} onSelect={handleFinderSelect} onClose={() => setFinderOpen(false)} />
+          )}
           {state.data.repos.length === 0 && (
             <StatusScreen role="status"><p>🚧 En obras: aún no hay repos públicos</p></StatusScreen>
           )}

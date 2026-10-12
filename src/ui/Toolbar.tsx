@@ -6,9 +6,10 @@ type ToolbarProps = {
   login: string
   timeOfDay: number
   onToggleTime: () => void
+  onOpenFinder: () => void
 }
 
-const Toolbar = ({ canvas, login, timeOfDay, onToggleTime }: ToolbarProps): ReactElement => {
+const Toolbar = ({ canvas, login, timeOfDay, onToggleTime, onOpenFinder }: ToolbarProps): ReactElement => {
   const [message, setMessage] = useState<string | null>(null)
   const messageTimeout = useRef<number | null>(null)
   const isNight = timeOfDay >= 0.75
@@ -65,6 +66,9 @@ const Toolbar = ({ canvas, login, timeOfDay, onToggleTime }: ToolbarProps): Reac
 
   return (
     <div className="city-toolbar" role="group" aria-label="Acciones de la ciudad">
+      <button type="button" aria-label="Buscar un edificio (atajo: /)" title="Buscar un edificio (/)" onClick={onOpenFinder}>
+        🔍
+      </button>
       <button
         type="button"
         aria-label={isNight ? 'Cambiar a día' : 'Cambiar a noche'}
