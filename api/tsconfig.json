@@ -1,0 +1,15 @@
+{
+  // Vercel runs these functions as native Node ESM, so type-check them with Node's resolution rules:
+  // relative imports need explicit .js extensions or they fail at runtime with ERR_MODULE_NOT_FOUND.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["node"]
+  },
+  "include": ["./**/*.ts", "../middleware.ts"]
+}

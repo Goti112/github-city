@@ -1,4 +1,4 @@
-import type { ApiErrorCode, CityResponse, Repo } from './types'
+import type { ApiErrorCode, CityResponse, Repo } from './types.js'
 
 type JsonRecord = Record<string, unknown>
 

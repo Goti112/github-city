@@ -1,4 +1,4 @@
-import { isValidUsername } from './github'
+import { isValidUsername } from './github.js'
 
 const setMeta = (html: string, property: string, content: string): string =>
   html.replace(new RegExp(`(<meta property="${property}" content=")[^"]*(")`), `$1${content}$2`)

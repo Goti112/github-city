@@ -7,7 +7,7 @@
     "dev": "vite",
     "start": "vercel dev",
     "build": "tsc -b && vite build",
-    "lint": "oxlint",
+    "lint": "oxlint && tsc -p api/tsconfig.json",
     "preview": "vite preview",
     "test": "vitest run --pool=threads"
   },
