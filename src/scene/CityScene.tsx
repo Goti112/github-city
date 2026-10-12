@@ -1,5 +1,5 @@
 import { Suspense, useCallback, useLayoutEffect, useMemo, useRef, useState, type ReactElement } from 'react'
-import { OrbitControls, Stars } from '@react-three/drei'
+import { OrbitControls, PerformanceMonitor, Stars } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import type { Building } from '../lib/types'
@@ -196,6 +196,8 @@ const CityScene = ({
     () => ({ value: KEYFRAMES.sunset.windowGlow }),
     [],
   )
+  // Adaptive quality: drop the render resolution on devices that cannot hold a smooth frame rate.
+  const [dpr, setDpr] = useState<number>(() => Math.min(window.devicePixelRatio, 2))
   const radius = useMemo(() => cityRadius(buildings), [buildings])
   const landmarkIndex = useMemo(() => (showLandmark ? pickLandmark(buildings) : null), [buildings, showLandmark])
   const landmark = landmarkIndex === null ? undefined : buildings[landmarkIndex]
@@ -207,12 +209,13 @@ const CityScene = ({
   return (
     <div className="city-scene" role="region" aria-label="Escena 3D de repositorios">
       <Canvas
-        dpr={[1, 2]}
+        dpr={dpr}
         shadows
         gl={{ preserveDrawingBuffer: true }}
         camera={{ fov: CAMERA_FOV, far: 4000 }}
         onCreated={({ gl }) => onCanvasReady?.(gl.domElement)}
       >
+        <PerformanceMonitor onDecline={() => setDpr((current) => Math.max(1, current * 0.75))} />
         <CityRig
           buildings={buildings}
           timeOfDay={timeOfDay}
