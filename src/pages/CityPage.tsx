@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useMemo, useState, type ReactElement } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import { CityError, fetchCity } from '../lib/api'
 import { cityLayout } from '../lib/cityLayout'
+import { cityStats } from '../lib/cityStats'
 import { EXAMPLE_CITY } from '../lib/exampleCity'
 import type { ApiErrorCode, CityResponse, Repo } from '../lib/types'
 import CityScene from '../scene/CityScene'
@@ -52,7 +53,9 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
   const [sceneAttempt, setSceneAttempt] = useState<number>(0)
   const loadingBuildings = useMemo(() => cityLayout(EXAMPLE_CITY.repos, now), [now])
 
+  const userPickedTime = useRef(false)
   const handleToggleTime = useCallback((): void => {
+    userPickedTime.current = true
     setTimeOfDay((current) => current === 1 ? 0 : 1)
   }, [])
   const handleCanvasReady = useCallback((nextCanvas: HTMLCanvasElement): void => {
@@ -93,6 +96,20 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
     }
   }, [retryCount, user])
 
+  const isReady = requestState.user === user && requestState.state.status === 'ok'
+  // Nightfall during the opening fly-in: the city lights up as the camera arrives.
+  useEffect(() => {
+    if (!isReady) {
+      return
+    }
+    const timeout = window.setTimeout(() => {
+      if (!userPickedTime.current) {
+        setTimeOfDay(1)
+      }
+    }, 1800)
+    return () => window.clearTimeout(timeout)
+  }, [isReady])
+
   const state: PageState = requestState.user === user
     ? requestState.state
     : { status: 'loading' }
@@ -101,6 +118,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
     () => data === null ? [] : cityLayout(data.repos, now),
     [data, now],
   )
+  const stats = useMemo(() => (data === null ? null : cityStats(data.repos, now)), [data, now])
   const interaction = interactionState
 
   const handleHover = useCallback((
@@ -180,6 +198,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
               timeOfDay={timeOfDay}
               hovered={null}
               autoRotateSpeed={0}
+              showLandmark={false}
             />
             <StatusScreen role="status"><p>Levantando tu ciudad…</p></StatusScreen>
           </>
@@ -217,6 +236,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
               onSelect={handleSelect}
               onCanvasReady={handleCanvasReady}
               autoRotateSpeed={0}
+              intro
             />
           </SceneErrorBoundary>
           <Toolbar canvas={canvasForCapture(state.status, canvas)} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} />
@@ -227,6 +247,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
             user={state.data.user}
             repositoryCount={state.data.repos.length}
             totalContributions={state.data.activity.totalContributions}
+            stats={stats ?? cityStats([], now)}
           />
           {hoveredBuildingName !== null && interaction.pointerPosition !== null && (
             <Tooltip label={hoveredBuildingName} position={interaction.pointerPosition} />

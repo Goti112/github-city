@@ -40,9 +40,10 @@ const Home = (): ReactElement => {
         <CityScene
           buildings={buildings}
           avatarUrl={EXAMPLE_CITY.user.avatarUrl}
-          timeOfDay={0.72}
+          timeOfDay={1}
           hovered={null}
           autoRotateSpeed={0.16}
+          showLandmark={false}
         />
       </SceneErrorBoundary>
       <div className="home-page__overlay" aria-hidden="true" />

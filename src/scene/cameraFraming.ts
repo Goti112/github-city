@@ -20,12 +20,15 @@ const viewDirection = (() => {
 // Margin so the city does not touch the screen edges (and survives portrait aspect ratios).
 const framingMargin = 1.05
 
+// Radius of the circle on the ground that contains every plot (and at least the plaza).
+export const cityRadius = (buildings: Building[]): number => buildings.reduce(
+  (radius, building) =>
+    Math.max(radius, Math.hypot(building.x, building.z) + Math.max(building.width, building.depth) / 2),
+  PLAZA_RADIUS,
+)
+
 export const cameraFraming = (buildings: Building[], aspect = 1): CameraFraming => {
-  const groundRadius = buildings.reduce(
-    (radius, building) =>
-      Math.max(radius, Math.hypot(building.x, building.z) + Math.max(building.width, building.depth) / 2),
-    PLAZA_RADIUS,
-  )
+  const groundRadius = cityRadius(buildings)
   const tallest = buildings.reduce((height, building) => Math.max(height, building.height), 5)
 
   const targetY = tallest / 4

@@ -233,6 +233,7 @@ export const cityLayout = (repos: Repo[], now: Date): Building[] => {
         color: colorForRepo(repo),
         litRatio: litRatio(repo.lastPush, now),
         district,
+        stars: repo.stars,
       }
     })
   })

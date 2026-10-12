@@ -24,9 +24,9 @@ export const KEYFRAMES: Record<KeyframeName, Lighting> = {
     bloom: 0,
   },
   night: {
-    sky: '#101820',
-    sun: 0.2,
-    ambient: 0.24,
+    sky: '#0a1422',
+    sun: 0.35,
+    ambient: 0.42,
     windowGlow: 1.5,
     bloom: 0.7,
   },

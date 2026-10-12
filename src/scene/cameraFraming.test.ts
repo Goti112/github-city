@@ -13,6 +13,7 @@ const makeBuilding = (x: number, z: number, height: number): Building => ({
   color: '#ffffff',
   litRatio: 1,
   district: 'TypeScript',
+  stars: 0,
 })
 
 const halfFov = (CAMERA_FOV / 2) * (Math.PI / 180)

@@ -34,4 +34,5 @@ export type Building = {
   color: string
   litRatio: number
   district: string
+  stars: number
 }
