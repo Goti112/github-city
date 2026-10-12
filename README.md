@@ -4,7 +4,7 @@ Convierte los repositorios públicos de cualquier perfil de GitHub en una ciudad
 
 ![Ilustración genérica de presentación de GitHub City](public/og.png)
 
-**Demo prevista:** [city.miquelmanzano.com](https://city.miquelmanzano.com) — pendiente de publicación.
+**Demo:** [city.miquelmanzano.com](https://city.miquelmanzano.com)
 
 La imagen de cabecera es una ilustración genérica para compartir el proyecto. La captura real de una ciudad se descarga desde la barra de herramientas de la aplicación.
 
@@ -85,6 +85,3 @@ npm run build
 
 La revisión visual en escritorio y móvil, el rendimiento real con unos 100 repositorios y la comprobación del PNG descargado se hacen en el navegador.
 
-## Publicación
-
-La demo y el dominio están pendientes de los pasos manuales del proyecto: subir el repositorio público a GitHub, importarlo en Vercel, configurar `GITHUB_TOKEN`, desplegar y añadir el dominio con el CNAME indicado por Vercel.
