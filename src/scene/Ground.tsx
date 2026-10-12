@@ -50,7 +50,7 @@ const createStreetMaterial = (radius: number, windowGlow: WindowGlowUniform): Me
         `float street = 1.0 - smoothstep(0.03, 0.09, ${(CELL / 2).toFixed(1)} - max(streetCell.x, streetCell.y));`,
         'float fromCentre = length(vCityPos.xz);',
         `float inCity = smoothstep(${PLAZA_RADIUS.toFixed(1)}, ${(PLAZA_RADIUS + 1).toFixed(1)}, fromCentre)`,
-        '  * (1.0 - smoothstep(uCityRadius, uCityRadius + 6.0, fromCentre));',
+        '  * (1.0 - smoothstep(uCityRadius - 1.0, uCityRadius + 2.5, fromCentre));',
         'totalEmissiveRadiance += vec3(0.25, 0.75, 0.95) * street * inCity * (0.03 + uGlow * 0.14);',
       ].join('\n'))
   }

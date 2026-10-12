@@ -17,8 +17,9 @@ const viewDirection = (() => {
   return [1 / length, 0.85 / length, 1 / length] as const
 })()
 
-// Margin so the city does not touch the screen edges (and survives portrait aspect ratios).
-const framingMargin = 1.05
+// The bounding sphere overestimates the city's silhouette, so wide screens (with spare horizontal
+// room) can sit closer than a perfect fit; square and portrait keep a margin so nothing is clipped.
+const framingMargin = (aspect: number): number => (aspect >= 1.3 ? 0.86 : 1.05)
 
 // Radius of the circle on the ground that contains every plot (and at least the plaza).
 export const cityRadius = (buildings: Building[]): number => buildings.reduce(
@@ -37,7 +38,7 @@ export const cameraFraming = (buildings: Building[], aspect = 1): CameraFraming 
   // The fov is vertical; on portrait screens the horizontal half-angle is the narrower one.
   const halfVerticalFov = (CAMERA_FOV / 2) * (Math.PI / 180)
   const halfFov = Math.min(halfVerticalFov, Math.atan(Math.tan(halfVerticalFov) * aspect))
-  const distance = (sphereRadius / Math.sin(halfFov)) * framingMargin
+  const distance = (sphereRadius / Math.sin(halfFov)) * framingMargin(aspect)
 
   return {
     position: [

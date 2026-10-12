@@ -49,7 +49,14 @@ const fragmentWindows = [
   'float isWall = 1.0 - step(0.5, abs(vWindowFaceNormal.y));',
   'float windowIsLit = step(cityWindowHash(windowCell, vSeed), clamp(vLit, 0.0, 1.0));',
   'totalEmissiveRadiance += vec3(1.0, 0.42, 0.13) * windowFrame * isWall * windowIsLit * uGlow;',
+  // Neon crown: a band in the district colour along the top of each facade, plus a faint roof glow.
+  'float crown = step(1.0 - 0.3 / max(vWindowSize.y, 0.6), vUv.y) * isWall;',
+  'float roof = step(0.5, vWindowFaceNormal.y);',
+  'totalEmissiveRadiance += vColor.rgb * (crown * 1.1 + roof * 0.22) * uGlow;',
 ].join('\n')
+
+// At night the facades darken so windows and neon carry the scene.
+const nightFacade = 'diffuseColor.rgb *= 1.0 - 0.5 * clamp(uGlow / 1.5, 0.0, 1.0);'
 
 const replaceShaderInclude = (source: string, include: string, additions: string): string => {
   if (!source.includes(include)) {
@@ -72,6 +79,7 @@ export const createWindowsMaterial = (windowGlow: WindowGlowUniform): MeshStanda
     shader.vertexShader = replaceShaderInclude(shader.vertexShader, '#include <common>', vertexDeclarations)
     shader.vertexShader = replaceShaderInclude(shader.vertexShader, '#include <begin_vertex>', vertexAssignments)
     shader.fragmentShader = replaceShaderInclude(shader.fragmentShader, '#include <common>', fragmentDeclarations)
+    shader.fragmentShader = replaceShaderInclude(shader.fragmentShader, '#include <color_fragment>', nightFacade)
     shader.fragmentShader = replaceShaderInclude(
       shader.fragmentShader,
       '#include <emissivemap_fragment>',
@@ -79,6 +87,6 @@ export const createWindowsMaterial = (windowGlow: WindowGlowUniform): MeshStanda
     )
   }
 
-  material.customProgramCacheKey = (): string => 'github-city-windows-v1'
+  material.customProgramCacheKey = (): string => 'github-city-windows-v2'
   return material
 }
