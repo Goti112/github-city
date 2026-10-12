@@ -15,8 +15,10 @@ Cada repositorio es un edificio; los commits lo hacen crecer, la actividad recie
 - **Vuelo de cámara cinematográfico** al entrar, mientras cae la noche sobre la ciudad.
 - **Ciudad viva:** calles iluminadas, tráfico de luces, balizas en los tejados de los repos con estrellas y un edificio emblemático con haz de luz.
 - **Tu ciudad en cifras:** de *Aldea* a *Metrópolis* según tus repos, con habitantes (commits), distritos, edificios encendidos, estrellas, tu rascacielos y tu barrio principal.
-- **Explora:** gira, acerca y selecciona cualquier edificio para ver su repositorio.
-- **Comparte:** cada `/ciudad/:usuario` tiene su propia tarjeta de vista previa para LinkedIn, X o WhatsApp, generada al vuelo con su skyline. También puedes descargar una captura PNG.
+- **Explora:** gira, acerca y selecciona cualquier edificio: la cámara vuela hasta él y abre su repositorio. También puedes buscarlo por nombre o lenguaje (atajo `/`).
+- **Historia:** un deslizador con reproducción automática reconstruye cómo se levantó la ciudad, año a año, desde tu primer repositorio.
+- **Duelo de ciudades:** `/vs/usuario1/usuario2` enfrenta dos perfiles con un marcador por categorías y corona para el ganador.
+- **Comparte:** cada ciudad y cada duelo tienen su propia tarjeta de vista previa para LinkedIn, X o WhatsApp, generada al vuelo. También puedes descargar una captura PNG.
 - Día, atardecer y noche; diseño adaptado a móvil; estados propios para usuarios inexistentes, perfiles vacíos y límites de GitHub.
 
 <img src="docs/screenshots/share-card.png" alt="Tarjeta de vista previa generada para un perfil" width="600" />
@@ -39,7 +41,7 @@ Los barrios se empaquetan de forma voraz alrededor de una plaza central con tu a
 flowchart LR
     Browser[React + React Three Fiber] -->|GET /api/city/:user| City[Función: api/city]
     Crawler[LinkedIn / X / WhatsApp] -->|GET /ciudad/:user| MW[Middleware: meta Open Graph]
-    Crawler -->|GET /api/og/:user| OG[Función: api/og · @vercel/og]
+    Crawler -->|GET /api/og/:user · /api/og-duel| OG[Funciones de imagen · @vercel/og]
     City --> Load[api/_lib/loadCity]
     OG --> Load
     Load -->|1 consulta GraphQL| GitHub[GitHub GraphQL API]
@@ -49,19 +51,19 @@ flowchart LR
 
 - **Una sola consulta GraphQL** por perfil (perfil, 100 repos y calendario de contribuciones) desde una función serverless; el token nunca llega al navegador.
 - **Caché en el edge:** `s-maxage=3600, stale-while-revalidate=86400`; un usuario inexistente se cachea 5 minutos y el resto de errores no se cachean. Las tarjetas de vista previa se cachean un día.
-- **Vistas previas dinámicas:** los robots de las redes sociales no ejecutan JavaScript, así que un middleware sirve `/ciudad/:usuario` con las etiquetas Open Graph de ese usuario y `/api/og/:usuario` dibuja la tarjeta con `@vercel/og`.
+- **Vistas previas dinámicas:** los robots de las redes sociales no ejecutan JavaScript, así que un middleware sirve `/ciudad/:usuario` y `/vs/:a/:b` con sus propias etiquetas Open Graph, y `/api/og/:usuario` y `/api/og-duel` dibujan las tarjetas con `@vercel/og`.
 
 ## Decisiones técnicas
 
-- **Lógica pura y testeada:** el transformador de GitHub, el layout de la ciudad, las cifras, el skyline de la tarjeta, el encuadre de cámara, el tráfico y las etiquetas de compartir son funciones puras con tests (Vitest, 79 tests).
-- **Rendimiento:** todos los edificios se dibujan con un único `InstancedMesh`; ventanas, coronas de neón y calles se calculan en shaders, sin geometría extra. La escena 3D se carga bajo demanda: el bundle inicial pesa ~200 kB y Three.js llega aparte.
+- **Lógica pura y testeada:** el transformador de GitHub, el layout, las cifras, el marcador del duelo, la línea temporal, el buscador, el encuadre y los movimientos de cámara, el tráfico y las etiquetas de compartir son funciones puras con tests. Los componentes interactivos (buscador, línea temporal, formulario de duelo) tienen tests con Testing Library. En total, 107 tests en Vitest.
+- **Rendimiento:** todos los edificios se dibujan con un único `InstancedMesh`; ventanas, coronas de neón y calles se calculan en shaders, sin geometría extra. La escena 3D se carga bajo demanda: el bundle inicial pesa ~200 kB y Three.js llega aparte. Si el dispositivo no mantiene una tasa de fotogramas fluida, la resolución de renderizado baja automáticamente.
 - **Cámara adaptativa:** el encuadre y la niebla se calculan a partir del tamaño de la ciudad, su edificio más alto y la proporción de la pantalla, así que una ciudad de 5 repos y una de 100 se ven enteras, también en vertical.
-- **Accesibilidad:** el vuelo de cámara se omite con `prefers-reduced-motion`; buscador, barra de herramientas y panel son controles HTML accesibles con teclado (Esc cierra el panel del repositorio).
+- **Accesibilidad:** los movimientos de cámara se omiten con `prefers-reduced-motion`; cualquier edificio es accesible sin ratón desde el buscador (combobox ARIA con flechas, Enter y Esc), y barra de herramientas, línea temporal y panel son controles HTML accesibles con teclado.
 - **Robustez:** reintentos ante errores transitorios de GitHub, detección del rate limit de GraphQL (que llega como HTTP 200) y `api/` comprobado con la resolución de módulos de Node ESM para que los fallos de importación salgan en CI y no en producción.
 
 ## Stack
 
-React 18 · TypeScript · Vite · React Three Fiber · Drei · postprocessing · React Router · Vercel Functions y Routing Middleware · `@vercel/og` · GitHub GraphQL API · Vitest · Oxlint · GitHub Actions
+React 18 · TypeScript · Vite · React Three Fiber · Drei · postprocessing · React Router · Vercel Functions y Routing Middleware · `@vercel/og` · GitHub GraphQL API · Vitest · Testing Library · Oxlint · GitHub Actions
 
 ## Ejecutar en local
 
