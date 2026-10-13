@@ -4,7 +4,7 @@ import { createElement as h, type CSSProperties, type ReactElement, type ReactNo
 // Shared building blocks for the 1200x630 share cards (@vercel/og renders a flexbox subset).
 export const WIDTH = 1200
 export const HEIGHT = 630
-export const numberFormat = new Intl.NumberFormat('es')
+export const numberFormats = { es: new Intl.NumberFormat('es'), en: new Intl.NumberFormat('en') }
 
 export const div = (style: CSSProperties, ...children: ReactNode[]): ReactElement => h('div', { style }, ...children)
 

@@ -4,7 +4,7 @@ import { compareCities, type ComparableCity } from '../src/lib/compare.js'
 import type { CityResponse } from '../src/lib/types.js'
 import { cityTitles, strings } from '../src/i18n/strings.js'
 import { loadCity } from './_lib/loadCity.js'
-import { avatar, card, div, fallbackCard, footer, numberFormat } from './_lib/ogParts.js'
+import { avatar, card, div, fallbackCard, footer, numberFormats } from './_lib/ogParts.js'
 
 // Share card for /vs/:left/:right duels: both players, the score and the verdict.
 const comparable = (city: CityResponse, now: Date): ComparableCity => {
@@ -35,6 +35,7 @@ export const GET = async (request: Request): Promise<Response> => {
   const params = new URL(request.url).searchParams
   const en = params.get('lang') === 'en'
   const t = strings[en ? 'en' : 'es']
+  const numberFormat = numberFormats[en ? 'en' : 'es']
   const titleOf = (city: CityResponse): string => {
     const title = cityStats(city.repos, now).title
     return en ? cityTitles[title] ?? title : title

@@ -3,12 +3,12 @@ import { cityStats } from '../../src/lib/cityStats.js'
 import { skylineBars } from '../../src/lib/skyline.js'
 import { cityTitles, strings } from '../../src/i18n/strings.js'
 import { loadCity } from '../_lib/loadCity.js'
-import { avatar, card, div, fallbackCard, footer, numberFormat } from '../_lib/ogParts.js'
+import { avatar, card, div, fallbackCard, footer, numberFormats } from '../_lib/ogParts.js'
 
 // Share card shown by LinkedIn / X / WhatsApp for /ciudad/:user links.
 const SKYLINE = { width: 560, height: 390 }
 
-const stat = (label: string, value: number): ReactNode => div(
+const stat = (label: string, value: number, numberFormat: Intl.NumberFormat): ReactNode => div(
   { display: 'flex', flexDirection: 'column', marginRight: 44 },
   div({ fontSize: 22, color: '#8fa3b1' }, label),
   div({ fontSize: 44, fontWeight: 700, color: '#f3f7fa' }, numberFormat.format(value)),
@@ -45,6 +45,7 @@ const building = (bar: ReturnType<typeof skylineBars>[number]): ReactNode => {
 export const GET = async (request: Request): Promise<Response> => {
   const t = strings[new URL(request.url).searchParams.get('lang') === 'en' ? 'en' : 'es']
   const en = t === strings.en
+  const numberFormat = numberFormats[en ? 'en' : 'es']
   const login = new URL(request.url).pathname.split('/').pop() ?? ''
   const result = await loadCity(decodeURIComponent(login))
 
@@ -68,9 +69,9 @@ export const GET = async (request: Request): Promise<Response> => {
         ),
       ),
       div({ display: 'flex', marginTop: 48 },
-        stat(t.buildings, city.repos.length),
-        stat(t.population, stats.population),
-        stat(t.stars, stats.stars),
+        stat(t.buildings, city.repos.length, numberFormat),
+        stat(t.population, stats.population, numberFormat),
+        stat(t.stars, stats.stars, numberFormat),
       ),
     ),
     div(
