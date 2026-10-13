@@ -278,6 +278,7 @@
   border: 0;
   border-radius: 999px;
   padding: 8px 12px;
+  white-space: nowrap;
   background: transparent;
   color: #a9bac5;
   cursor: pointer;
@@ -868,12 +869,13 @@
 }
 
 @media (max-width: 600px) {
+  /* Stack above the bottom toolbar (16px gap + ~56px tall) with breathing room. */
   .timeline {
-    bottom: calc(72px + env(safe-area-inset-bottom));
+    bottom: calc(84px + env(safe-area-inset-bottom));
   }
 
   .repo-finder {
-    bottom: calc(128px + env(safe-area-inset-bottom));
+    bottom: calc(144px + env(safe-area-inset-bottom));
   }
 }
 
@@ -1113,7 +1115,7 @@
     top: auto;
     right: 12px;
     left: 12px;
-    bottom: calc(128px + env(safe-area-inset-bottom));
+    bottom: calc(144px + env(safe-area-inset-bottom));
   }
 }
 
@@ -1264,7 +1266,7 @@
     right: 12px;
     left: 12px;
     width: auto;
-    bottom: calc(128px + env(safe-area-inset-bottom));
+    bottom: calc(144px + env(safe-area-inset-bottom));
   }
 }
 
