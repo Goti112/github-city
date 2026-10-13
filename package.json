@@ -32,6 +32,7 @@
     "@types/three": "^0.186.0",
     "@vercel/node": "^22.0.0",
     "@vitejs/plugin-react": "^6.1.1",
+    "axe-core": "^4.10.3",
     "jsdom": "^26.1.0",
     "oxlint": "^1.81.0",
     "typescript": "~6.0.2",
