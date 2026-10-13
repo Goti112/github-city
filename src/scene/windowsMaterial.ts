@@ -39,18 +39,29 @@ const fragmentWindows = [
   'vec2 facadeSize = abs(vWindowFaceNormal.x) > 0.5',
   '  ? vec2(vWindowSize.z, vWindowSize.y)',
   '  : vec2(vWindowSize.x, vWindowSize.y);',
-  'vec2 windowGrid = vUv * facadeSize / vec2(0.42, 0.54);',
+  // Whole columns only, stretched to fill the facade width, so no window is ever cut at a corner.
+  'float windowCols = max(1.0, floor(facadeSize.x / 0.42 + 0.5));',
+  // Floors are fixed in world units and counted from the ground: while a building rises,
+  // new floors appear one by one instead of the whole grid stretching.
+  'float crownHeight = 0.3;',
+  'float windowRows = floor(max(facadeSize.y - crownHeight - 0.15, 0.0) / 0.54);',
+  'vec2 windowGrid = vec2(vUv.x * windowCols, vUv.y * facadeSize.y / 0.54);',
   'vec2 windowCell = floor(windowGrid);',
   'vec2 windowLocal = fract(windowGrid);',
-  'float windowFrame = step(0.1, windowLocal.x)',
-  '  * (1.0 - step(0.9, windowLocal.x))',
-  '  * step(0.15, windowLocal.y)',
-  '  * (1.0 - step(0.82, windowLocal.y));',
+  // Anti-aliased edges: soften each border by one pixel so distant facades do not shimmer.
+  'vec2 windowAa = max(fwidth(windowGrid), vec2(1e-4));',
+  'vec2 windowLo = smoothstep(vec2(0.14, 0.18) - windowAa, vec2(0.14, 0.18) + windowAa, windowLocal);',
+  'vec2 windowHi = 1.0 - smoothstep(vec2(0.86, 0.80) - windowAa, vec2(0.86, 0.80) + windowAa, windowLocal);',
+  'float windowFrame = windowLo.x * windowLo.y * windowHi.x * windowHi.y;',
+  // When a window is smaller than a couple of pixels, fade to its average coverage instead of aliasing.
+  'float windowFar = smoothstep(0.25, 0.6, max(windowAa.x, windowAa.y));',
+  'windowFrame = mix(windowFrame, 0.48, windowFar);',
+  'windowFrame *= step(windowCell.y, windowRows - 1.0);',
   'float isWall = 1.0 - step(0.5, abs(vWindowFaceNormal.y));',
   'float windowIsLit = step(cityWindowHash(windowCell, vSeed), clamp(vLit, 0.0, 1.0));',
   'totalEmissiveRadiance += vec3(1.0, 0.42, 0.13) * windowFrame * isWall * windowIsLit * uGlow;',
-  // Neon crown: a band in the district colour along the top of each facade, plus a faint roof glow.
-  'float crown = step(1.0 - 0.3 / max(vWindowSize.y, 0.6), vUv.y) * isWall;',
+// Neon crown: a band in the district colour along the top of each facade, plus a faint roof glow.
+  'float crown = step(1.0 - crownHeight / max(vWindowSize.y, 0.6), vUv.y) * isWall;',
   'float roof = step(0.5, vWindowFaceNormal.y);',
   'totalEmissiveRadiance += vColor.rgb * (crown * 1.1 + roof * 0.22) * uGlow;',
 ].join('\n')
@@ -87,6 +98,6 @@ export const createWindowsMaterial = (windowGlow: WindowGlowUniform): MeshStanda
     )
   }
 
-  material.customProgramCacheKey = (): string => 'github-city-windows-v2'
+  material.customProgramCacheKey = (): string => 'github-city-windows-v3'
   return material
 }
