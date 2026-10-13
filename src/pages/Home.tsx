@@ -64,6 +64,7 @@ const Home = (): ReactElement => {
         <div className="home-page__duel">
           <span>¿O prefieres un duelo?</span>
           <CompareForm />
+          <Link className="home-page__duel-example" to="/vs/torvalds/gaearon">Ver torvalds vs gaearon</Link>
         </div>
       </section>
     </main>

@@ -1116,3 +1116,10 @@
     bottom: calc(128px + env(safe-area-inset-bottom));
   }
 }
+
+.home-page__duel-example {
+  flex-basis: 100%;
+  color: #ffd166;
+  font-size: 0.8rem;
+  text-align: center;
+}

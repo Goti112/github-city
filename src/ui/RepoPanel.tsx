@@ -35,6 +35,7 @@ const formatRelativeTime = (lastPush: string, now: Date): string => {
 }
 
 const numberFormat = new Intl.NumberFormat('es')
+const monthYearFormat = new Intl.DateTimeFormat('es', { month: 'long', year: 'numeric', timeZone: 'UTC' })
 
 const RepoPanel = ({ repo, onClose }: RepoPanelProps): ReactElement => {
   const [now] = useState<Date>(() => new Date())
@@ -77,6 +78,10 @@ const RepoPanel = ({ repo, onClose }: RepoPanelProps): ReactElement => {
         <div>
           <dt>Último push</dt>
           <dd><time dateTime={repo.lastPush}>{formatRelativeTime(repo.lastPush, now)}</time></dd>
+        </div>
+        <div>
+          <dt>Construido en</dt>
+          <dd><time dateTime={repo.createdAt}>{monthYearFormat.format(new Date(repo.createdAt))}</time></dd>
         </div>
       </dl>
       <a className="repo-panel__link" href={repo.url} target="_blank" rel="noopener">
