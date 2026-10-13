@@ -1,14 +1,16 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from 'react'
-import { Link, useLocation, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { CityError, fetchCity } from '../lib/api'
 import { cityLayout } from '../lib/cityLayout'
 import { cityStats } from '../lib/cityStats'
+import { readCityParams, writeCityParams } from '../lib/cityParams'
 import { builtBy, timelineRange } from '../lib/timeline'
 import { EXAMPLE_CITY } from '../lib/exampleCity'
 import type { ApiErrorCode, CityResponse, Repo } from '../lib/types'
 import CityScene from '../scene/LazyCityScene'
 import CompareForm from '../ui/CompareForm'
 import RepoFinder from '../ui/RepoFinder'
+import ShortcutsHelp from '../ui/ShortcutsHelp'
 import Timeline from '../ui/Timeline'
 import RepoPanel from '../ui/RepoPanel'
 import SearchBar from '../ui/SearchBar'
@@ -52,6 +54,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
     selectedRepo: null,
   }))
   const [timeOfDay, setTimeOfDay] = useState<number>(0.5)
+  const [visibleYear, setVisibleYear] = useState<number | null>(null)
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
   const [retryCount, setRetryCount] = useState<number>(0)
   const [sceneAttempt, setSceneAttempt] = useState<number>(0)
@@ -75,6 +78,22 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
     setSceneAttempt((current) => current + 1)
   }, [])
 
+  // Shared links: ?repo=…&year=… reopen the same building and moment once the city arrives.
+  const initialParams = useRef(new URLSearchParams(window.location.search))
+  const restoredParams = useRef(false)
+  const restoreSharedView = useCallback((data: CityResponse): void => {
+    restoredParams.current = true
+    const years = data.repos.map((repo) => ({ createdYear: new Date(repo.createdAt).getUTCFullYear() }))
+    const { repo, year } = readCityParams(initialParams.current, data.repos, timelineRange(years, now))
+    if (year !== null) {
+      setVisibleYear(year)
+    }
+    const sharedRepo = data.repos.find(({ name }) => name === repo)
+    if (sharedRepo !== undefined) {
+      setInteractionState((current) => ({ ...current, selectedRepo: sharedRepo }))
+    }
+  }, [now])
+
   useEffect(() => {
     if (user === undefined) {
       return
@@ -86,6 +105,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
       .then((data) => {
         if (isCurrentRequest) {
           setRequestState({ user, state: { status: 'ok', data } })
+          restoreSharedView(data)
         }
       })
       .catch((error: unknown) => {
@@ -98,7 +118,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
     return () => {
       isCurrentRequest = false
     }
-  }, [retryCount, user])
+  }, [restoreSharedView, retryCount, user])
 
   const isReady = requestState.user === user && requestState.state.status === 'ok'
   // Nightfall during the opening fly-in: the city lights up as the camera arrives.
@@ -169,20 +189,39 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
 
   const [finderOpen, setFinderOpen] = useState(false)
   const [duelOpen, setDuelOpen] = useState(false)
-  const [visibleYear, setVisibleYear] = useState<number | null>(null)
   const range = useMemo(() => timelineRange(buildings, now), [buildings, now])
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // ...and keep the URL in sync so the copy-link button shares exactly this view.
+  const selectedName = interactionState.selectedRepo?.name ?? null
+  useEffect(() => {
+    if (!restoredParams.current) {
+      return
+    }
+    const next = writeCityParams({ repo: selectedName, year: visibleYear })
+    if (next.toString() !== searchParams.toString()) {
+      setSearchParams(next, { replace: true })
+    }
+  }, [searchParams, selectedName, setSearchParams, visibleYear])
   const handleFinderSelect = useCallback((repo: Repo): void => {
     setFinderOpen(false)
     setInteractionState((current) => ({ ...current, selectedRepo: repo }))
   }, [])
 
-  // "/" opens the building finder, like search on GitHub.
+  // "/" opens the building finder (like search on GitHub) and "?" the shortcuts help.
+  const [helpOpen, setHelpOpen] = useState(false)
   useEffect(() => {
     const handleKey = (event: globalThis.KeyboardEvent): void => {
       const typing = event.target instanceof HTMLElement && ['INPUT', 'TEXTAREA'].includes(event.target.tagName)
-      if (event.key === '/' && !typing && isReady) {
+      if (typing || !isReady) {
+        return
+      }
+      if (event.key === '/') {
         event.preventDefault()
         setFinderOpen(true)
+      } else if (event.key === '?') {
+        event.preventDefault()
+        setHelpOpen((open) => !open)
       }
     }
     window.addEventListener('keydown', handleKey)
@@ -287,6 +326,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
               onChange={setVisibleYear}
             />
           )}
+          {helpOpen && <ShortcutsHelp onClose={() => setHelpOpen(false)} />}
           {finderOpen && (
             <RepoFinder repos={state.data.repos} onSelect={handleFinderSelect} onClose={() => setFinderOpen(false)} />
           )}
@@ -313,9 +353,9 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
 
 const CityPage = (): ReactElement => {
   const { user } = useParams()
-  const location = useLocation()
 
-  return <CityPageContent key={`${location.key}:${user ?? ''}`} user={user} />
+  // Keyed by user only: ?repo/?year changes are in-page state, not a new city.
+  return <CityPageContent key={user ?? ''} user={user} />
 }
 
 export default CityPage
