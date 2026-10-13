@@ -39,4 +39,22 @@ export const useLang = (): Lang => useSyncExternalStore(subscribe, () => current
 
 export const useStrings = (): Strings => strings[useLang()]
 
+export type Formats = {
+  number: Intl.NumberFormat
+  percent: Intl.NumberFormat
+  relative: Intl.RelativeTimeFormat
+  monthYear: Intl.DateTimeFormat
+}
+
+const makeFormats = (lang: Lang): Formats => ({
+  number: new Intl.NumberFormat(lang),
+  percent: new Intl.NumberFormat(lang, { style: 'percent', maximumFractionDigits: 0 }),
+  relative: new Intl.RelativeTimeFormat(lang, { numeric: 'auto' }),
+  monthYear: new Intl.DateTimeFormat(lang, { month: 'long', year: 'numeric', timeZone: 'UTC' }),
+})
+
+const formatsByLang: Record<Lang, Formats> = { es: makeFormats('es'), en: makeFormats('en') }
+
+export const useFormats = (): Formats => formatsByLang[useLang()]
+
 export const useCityTitle = (title: string): string => (useLang() === 'en' ? cityTitles[title] ?? title : title)

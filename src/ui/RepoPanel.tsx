@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react'
-import { useStrings } from '../i18n/useLang'
+import { useFormats, useStrings } from '../i18n/useLang'
 import type { Repo } from '../lib/types'
 
 type RepoPanelProps = {
@@ -7,9 +7,7 @@ type RepoPanelProps = {
   onClose: () => void
 }
 
-const relativeTimeFormat = new Intl.RelativeTimeFormat('es', { numeric: 'auto' })
-
-const formatRelativeTime = (lastPush: string, now: Date): string => {
+const formatRelativeTime = (lastPush: string, now: Date, relativeTimeFormat: Intl.RelativeTimeFormat): string => {
   const lastPushTime = new Date(lastPush).getTime()
   if (!Number.isFinite(lastPushTime)) {
     throw new RangeError(`El repositorio tiene una fecha de push inválida: ${lastPush}`)
@@ -35,11 +33,10 @@ const formatRelativeTime = (lastPush: string, now: Date): string => {
   return relativeTimeFormat.format(Math.round(elapsedSeconds / 60), 'minute')
 }
 
-const numberFormat = new Intl.NumberFormat('es')
-const monthYearFormat = new Intl.DateTimeFormat('es', { month: 'long', year: 'numeric', timeZone: 'UTC' })
 
 const RepoPanel = ({ repo, onClose }: RepoPanelProps): ReactElement => {
   const t = useStrings()
+  const { number: numberFormat, relative, monthYear: monthYearFormat } = useFormats()
   const [now] = useState<Date>(() => new Date())
 
   useEffect(() => {
@@ -79,7 +76,7 @@ const RepoPanel = ({ repo, onClose }: RepoPanelProps): ReactElement => {
         </div>
         <div>
           <dt>{t.lastPush}</dt>
-          <dd><time dateTime={repo.lastPush}>{formatRelativeTime(repo.lastPush, now)}</time></dd>
+          <dd><time dateTime={repo.lastPush}>{formatRelativeTime(repo.lastPush, now, relative)}</time></dd>
         </div>
         <div>
           <dt>{t.builtIn}</dt>

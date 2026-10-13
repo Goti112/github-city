@@ -1,5 +1,5 @@
 import type { ReactElement } from 'react'
-import { useCityTitle, useStrings } from '../i18n/useLang'
+import { useCityTitle, useFormats, useStrings } from '../i18n/useLang'
 import type { CityStats } from '../lib/cityStats'
 import type { CityResponse } from '../lib/types'
 import LangSwitch from './LangSwitch'
@@ -11,11 +11,10 @@ type UserCardProps = {
   stats: CityStats
 }
 
-const numberFormat = new Intl.NumberFormat('es')
-const percentFormat = new Intl.NumberFormat('es', { style: 'percent', maximumFractionDigits: 0 })
 
 const UserCard = ({ user, repositoryCount, totalContributions, stats }: UserCardProps): ReactElement => {
   const t = useStrings()
+  const { number: numberFormat, percent: percentFormat } = useFormats()
   const title = useCityTitle(stats.title)
   return (
   <section className="user-card" aria-label={`Perfil de GitHub de ${user.login}`}>

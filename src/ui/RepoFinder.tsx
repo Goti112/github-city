@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactElement } from 'react'
-import { useStrings } from '../i18n/useLang'
+import { useFormats, useStrings } from '../i18n/useLang'
 import { searchRepos } from '../lib/searchRepos'
 import type { Repo } from '../lib/types'
 
@@ -9,11 +9,11 @@ type RepoFinderProps = {
   onClose: () => void
 }
 
-const numberFormat = new Intl.NumberFormat('es')
 
 // Keyboard-first way to reach any building: also the accessible alternative to clicking in 3D.
 const RepoFinder = ({ repos, onSelect, onClose }: RepoFinderProps): ReactElement => {
   const t = useStrings()
+  const { number: numberFormat } = useFormats()
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
   const inputRef = useRef<HTMLInputElement | null>(null)

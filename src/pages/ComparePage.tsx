@@ -6,13 +6,12 @@ import { compareCities, type ComparableCity } from '../lib/compare'
 import type { CityResponse } from '../lib/types'
 import { useCity, type CityState } from '../lib/useCity'
 import type { Strings } from '../i18n/strings'
-import { useCityTitle, useStrings } from '../i18n/useLang'
+import { useCityTitle, useFormats, useStrings } from '../i18n/useLang'
 import CityScene from '../scene/LazyCityScene'
 import CompareForm from '../ui/CompareForm'
 import { SceneErrorBoundary } from '../ui/SceneErrorBoundary'
 import StatusScreen from '../ui/StatusScreen'
 
-const numberFormat = new Intl.NumberFormat('es')
 
 const comparable = (data: CityResponse, now: Date): ComparableCity => {
   const stats = cityStats(data.repos, now)
@@ -55,6 +54,7 @@ const failure = (login: string, state: CityState, t: Strings): string | null =>
 
 const ComparePage = (): ReactElement => {
   const t = useStrings()
+  const { number: numberFormat } = useFormats()
   const { left = '', right = '' } = useParams()
   const leftCity = useCity(left)
   const rightCity = useCity(right)
