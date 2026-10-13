@@ -67,7 +67,7 @@ const Toolbar = ({ canvas, login, timeOfDay, onToggleTime, onOpenFinder, onOpenD
 
   return (
     <div className="city-toolbar" role="group" aria-label="Acciones de la ciudad">
-      <button type="button" aria-label="Buscar un edificio (atajo: /)" title="Buscar un edificio (/)" onClick={onOpenFinder}>
+      <button type="button" aria-label="Buscar un edificio (atajo: /)" title="Buscar un edificio (/) · Atajos de teclado (?)" onClick={onOpenFinder}>
         🔍
       </button>
       <button type="button" aria-label="Retar a otro perfil a un duelo" title="Duelo de ciudades" onClick={onOpenDuel}>
