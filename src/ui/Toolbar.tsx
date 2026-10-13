@@ -8,9 +8,10 @@ type ToolbarProps = {
   onToggleTime: () => void
   onOpenFinder: () => void
   onOpenDuel: () => void
+  onOpenBadge: () => void
 }
 
-const Toolbar = ({ canvas, login, timeOfDay, onToggleTime, onOpenFinder, onOpenDuel }: ToolbarProps): ReactElement => {
+const Toolbar = ({ canvas, login, timeOfDay, onToggleTime, onOpenFinder, onOpenDuel, onOpenBadge }: ToolbarProps): ReactElement => {
   const [message, setMessage] = useState<string | null>(null)
   const messageTimeout = useRef<number | null>(null)
   const isNight = timeOfDay >= 0.75
@@ -69,6 +70,9 @@ const Toolbar = ({ canvas, login, timeOfDay, onToggleTime, onOpenFinder, onOpenD
     <div className="city-toolbar" role="group" aria-label="Acciones de la ciudad">
       <button type="button" aria-label="Buscar un edificio (atajo: /)" title="Buscar un edificio (/) · Atajos de teclado (?)" onClick={onOpenFinder}>
         🔍
+      </button>
+      <button type="button" aria-label="Badge de tu ciudad para el README" title="Badge para tu README" onClick={onOpenBadge}>
+        📛
       </button>
       <button type="button" aria-label="Retar a otro perfil a un duelo" title="Duelo de ciudades" onClick={onOpenDuel}>
         ⚔️

@@ -19,9 +19,20 @@ Cada repositorio es un edificio; los commits lo hacen crecer, la actividad recie
 - **Historia:** un deslizador con reproducción automática reconstruye cómo se levantó la ciudad, año a año, desde tu primer repositorio.
 - **Duelo de ciudades:** `/vs/usuario1/usuario2` enfrenta dos perfiles con un marcador por categorías y corona para el ganador.
 - **Comparte:** cada ciudad y cada duelo tienen su propia tarjeta de vista previa para LinkedIn, X o WhatsApp, generada al vuelo. También puedes descargar una captura PNG.
+- **Badge para tu README:** enseña tu ciudad en tu perfil de GitHub (botón 📛 en tu ciudad).
 - Día, atardecer y noche; diseño adaptado a móvil; estados propios para usuarios inexistentes, perfiles vacíos y límites de GitHub.
 
 <img src="docs/screenshots/share-card.png" alt="Tarjeta de vista previa generada para un perfil" width="600" />
+
+## Pon tu ciudad en tu perfil
+
+[![Mi GitHub City](https://city.miquelmanzano.com/api/badge/Goti112)](https://city.miquelmanzano.com/ciudad/Goti112)
+
+Cambia `TU_USUARIO` y pégalo en el README de tu perfil:
+
+```markdown
+[![Mi GitHub City](https://city.miquelmanzano.com/api/badge/TU_USUARIO)](https://city.miquelmanzano.com/ciudad/TU_USUARIO)
+```
 
 ## De datos a ciudad
 

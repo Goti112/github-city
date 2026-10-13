@@ -8,6 +8,7 @@ import { builtBy, timelineRange } from '../lib/timeline'
 import { EXAMPLE_CITY } from '../lib/exampleCity'
 import type { ApiErrorCode, CityResponse, Repo } from '../lib/types'
 import CityScene from '../scene/LazyCityScene'
+import BadgePopover from '../ui/BadgePopover'
 import CompareForm from '../ui/CompareForm'
 import RepoFinder from '../ui/RepoFinder'
 import ShortcutsHelp from '../ui/ShortcutsHelp'
@@ -189,6 +190,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
 
   const [finderOpen, setFinderOpen] = useState(false)
   const [duelOpen, setDuelOpen] = useState(false)
+  const [badgeOpen, setBadgeOpen] = useState(false)
   const range = useMemo(() => timelineRange(buildings, now), [buildings, now])
   const [searchParams, setSearchParams] = useSearchParams()
 
@@ -310,7 +312,16 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
               visibleYear={visibleYear}
             />
           </SceneErrorBoundary>
-          <Toolbar canvas={canvasForCapture(state.status, canvas)} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} onOpenFinder={() => setFinderOpen(true)} onOpenDuel={() => setDuelOpen((open) => !open)} />
+          <Toolbar canvas={canvasForCapture(state.status, canvas)} login={state.data.user.login} timeOfDay={timeOfDay} onToggleTime={handleToggleTime} onOpenFinder={() => setFinderOpen(true)} onOpenDuel={() => {
+              setBadgeOpen(false)
+              setDuelOpen((open) => !open)
+            }}
+            onOpenBadge={() => {
+              setDuelOpen(false)
+              setBadgeOpen((open) => !open)
+            }}
+          />
+          {badgeOpen && <BadgePopover login={state.data.user.login} />}
           {duelOpen && (
             <div className="duel-popover" role="dialog" aria-label="Duelo de ciudades">
               <p>Reta a otro perfil</p>
