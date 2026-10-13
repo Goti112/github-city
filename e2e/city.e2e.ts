@@ -65,3 +65,9 @@ test('the city loads without runtime errors', async ({ page }) => {
   await page.waitForTimeout(1500)
   expect(errors).toEqual([])
 })
+
+test('an English link shows the city in English', async ({ page }) => {
+  await page.goto('/ciudad/ana?lang=en')
+  await expect(page.getByText('GitHub City · Town')).toBeVisible()
+  await expect(page.getByText('2026 · 6 of 6 buildings')).toBeVisible()
+})

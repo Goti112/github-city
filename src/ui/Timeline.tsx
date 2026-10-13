@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react'
+import { useStrings } from '../i18n/useLang'
 import type { TimelineRange } from '../lib/timeline'
 
 type TimelineProps = {
@@ -14,6 +15,7 @@ const stepMs = 900
 // History slider: replay how the city was built, one year at a time.
 const Timeline = ({ range, year, builtCount, total, onChange }: TimelineProps): ReactElement => {
   const [playing, setPlaying] = useState(false)
+  const t = useStrings()
   const current = year ?? range.last
 
   // One tick per year while playing; each new year schedules the next.
@@ -45,7 +47,7 @@ const Timeline = ({ range, year, builtCount, total, onChange }: TimelineProps): 
 
   return (
     <div className="timeline" role="group" aria-label="Historia de la ciudad">
-      <button type="button" className="timeline__play" onClick={handlePlay} aria-label={playing ? 'Pausar la historia' : 'Ver cómo se construyó la ciudad'}>
+      <button type="button" className="timeline__play" onClick={handlePlay} aria-label={playing ? t.pauseHistory : t.playHistory}>
         {playing ? '❚❚' : '▶'}
       </button>
       <input
@@ -54,8 +56,8 @@ const Timeline = ({ range, year, builtCount, total, onChange }: TimelineProps): 
         max={range.last}
         step={1}
         value={current}
-        aria-label="Año"
-        aria-valuetext={`${current}: ${builtCount} de ${total} edificios`}
+        aria-label={t.year}
+        aria-valuetext={`${current}: ${t.builtOf(builtCount, total)}`}
         onChange={(event) => {
           setPlaying(false)
           const value = Number(event.currentTarget.value)
@@ -63,7 +65,7 @@ const Timeline = ({ range, year, builtCount, total, onChange }: TimelineProps): 
         }}
       />
       <p className="timeline__label" aria-live="polite">
-        <strong>{current}</strong> · {builtCount} de {total} edificios
+        <strong>{current}</strong> · {t.builtOf(builtCount, total)}
       </p>
     </div>
   )

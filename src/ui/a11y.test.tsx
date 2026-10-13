@@ -40,17 +40,18 @@ afterEach(cleanup)
 
 describe('accessibility (axe)', () => {
   const cases: Array<[string, ReactElement]> = [
-    ['Home', <Home />],
-    ['NotFound', <NotFound />],
-    ['UserNotFound', <UserNotFound />],
-    ['RepoPanel', <RepoPanel repo={repo} onClose={() => undefined} />],
-    ['RepoFinder', <RepoFinder repos={[repo]} onSelect={() => undefined} onClose={() => undefined} />],
-    ['Timeline', <Timeline range={{ first: 2024, last: 2026 }} year={null} builtCount={1} total={1} onChange={() => undefined} />],
-    ['ShortcutsHelp', <ShortcutsHelp onClose={() => undefined} />],
-    ['BadgePopover', <BadgePopover login="Goti112" />],
+    ['Home', <Home key="Home" />],
+    ['NotFound', <NotFound key="NotFound" />],
+    ['UserNotFound', <UserNotFound key="UserNotFound" />],
+    ['RepoPanel', <RepoPanel key="RepoPanel" repo={repo} onClose={() => undefined} />],
+    ['RepoFinder', <RepoFinder key="RepoFinder" repos={[repo]} onSelect={() => undefined} onClose={() => undefined} />],
+    ['Timeline', <Timeline key="Timeline" range={{ first: 2024, last: 2026 }} year={null} builtCount={1} total={1} onChange={() => undefined} />],
+    ['ShortcutsHelp', <ShortcutsHelp key="ShortcutsHelp" onClose={() => undefined} />],
+    ['BadgePopover', <BadgePopover key="BadgePopover" login="Goti112" />],
     [
       'Toolbar',
       <Toolbar
+        key="Toolbar"
         canvas={null}
         login="Goti112"
         timeOfDay={1}

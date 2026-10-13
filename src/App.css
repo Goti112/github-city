@@ -1273,3 +1273,45 @@
 .home-page__examples--famous {
   margin-top: -6px;
 }
+
+.lang-switch {
+  display: inline-flex;
+  gap: 2px;
+  border: 1px solid rgba(191, 221, 225, 0.2);
+  border-radius: 999px;
+  padding: 2px;
+  background: rgba(9, 16, 23, 0.6);
+}
+
+.lang-switch button {
+  border: 0;
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: transparent;
+  color: #8fa3b1;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.lang-switch button[aria-pressed='true'] {
+  background: rgba(115, 224, 192, 0.18);
+  color: #73e0c0;
+}
+
+.lang-switch button:focus-visible {
+  outline: 2px solid #73e0c0;
+  outline-offset: 1px;
+}
+
+.home-page__lang {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+}
+
+.user-card__lang {
+  float: right;
+  margin-left: 8px;
+}

@@ -5,7 +5,9 @@ import { EXAMPLE_CITY } from '../lib/exampleCity'
 import CityScene from '../scene/LazyCityScene'
 import { SceneErrorBoundary } from '../ui/SceneErrorBoundary'
 import CompareForm from '../ui/CompareForm'
+import LangSwitch from '../ui/LangSwitch'
 import SearchBar from '../ui/SearchBar'
+import { useStrings } from '../i18n/useLang'
 
 type ExampleProfile = {
   login: string
@@ -27,6 +29,7 @@ const famousCities: ExampleProfile[] = [
 ]
 
 const Home = (): ReactElement => {
+  const t = useStrings()
   const [now] = useState<Date>(() => new Date())
   const [sceneAttempt, setSceneAttempt] = useState<number>(0)
   // The background is a generated demo city: always busy, instant, and costs no API call.
@@ -41,8 +44,8 @@ const Home = (): ReactElement => {
         key={sceneAttempt}
         fallback={(
           <div className="home-page__scene-error" role="alert">
-            <span>La escena de ejemplo no está disponible. Puedes seguir buscando.</span>
-            <button type="button" onClick={handleSceneRetry}>Reintentar escena</button>
+            <span>{t.sceneUnavailableHome}</span>
+            <button type="button" onClick={handleSceneRetry}>{t.retryScene}</button>
           </div>
         )}
       >
@@ -57,28 +60,29 @@ const Home = (): ReactElement => {
       </SceneErrorBoundary>
       <div className="home-page__overlay" aria-hidden="true" />
       <section className="home-page__content">
+        <LangSwitch className="home-page__lang" />
         <p className="home-page__eyebrow">GitHub City</p>
-        <h1>Un perfil. Una ciudad.</h1>
+        <h1>{t.homeTitle}</h1>
         <p className="home-page__description">
-          Convierte los repositorios públicos de GitHub en un lugar que puedes recorrer.
+          {t.homeDescription}
         </p>
         <SearchBar />
         <div className="home-page__examples">
-          <span>Prueba con</span>
+          <span>{t.tryWith}</span>
           {exampleProfiles.map(({ login, name }) => (
             <Link key={login} to={`/ciudad/${login}`}>{name}</Link>
           ))}
         </div>
         <div className="home-page__examples home-page__examples--famous">
-          <span>Metrópolis famosas</span>
+          <span>{t.famous}</span>
           {famousCities.map(({ login, name }) => (
             <Link key={login} to={`/ciudad/${login}`}>{name}</Link>
           ))}
         </div>
         <div className="home-page__duel">
-          <span>¿O prefieres un duelo?</span>
+          <span>{t.duelPrompt}</span>
           <CompareForm />
-          <Link className="home-page__duel-example" to="/vs/torvalds/gaearon">Ver torvalds vs gaearon</Link>
+          <Link className="home-page__duel-example" to="/vs/torvalds/gaearon">{t.duelExample}</Link>
         </div>
       </section>
     </main>
