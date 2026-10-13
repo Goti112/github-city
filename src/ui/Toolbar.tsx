@@ -57,8 +57,20 @@ const Toolbar = ({ canvas, login, timeOfDay, onToggleTime, onOpenFinder, onOpenD
   }, [canvas, login, showMessage])
 
   const handleCopyLink = useCallback(async (): Promise<void> => {
+    const url = window.location.href
+    // Phones get the native share sheet (WhatsApp, LinkedIn…); desktops copy the link.
+    if (typeof navigator.share === 'function' && window.matchMedia('(pointer: coarse)').matches) {
+      try {
+        await navigator.share({ title: `La ciudad de @${login} · GitHub City`, url })
+        return
+      } catch (error: unknown) {
+        if (error instanceof DOMException && error.name === 'AbortError') {
+          return // the user closed the share sheet
+        }
+      }
+    }
     try {
-      await navigator.clipboard.writeText(window.location.href)
+      await navigator.clipboard.writeText(url)
       showMessage('¡Enlace copiado!', 2000)
     } catch (error: unknown) {
       console.error('No se pudo copiar el enlace de la ciudad', { error, login })
@@ -87,7 +99,7 @@ const Toolbar = ({ canvas, login, timeOfDay, onToggleTime, onOpenFinder, onOpenD
       <button type="button" aria-label="Descargar captura PNG" disabled={canvas === null} onClick={() => void handleCapture()}>
         📸
       </button>
-      <button type="button" aria-label="Copiar enlace de la ciudad" onClick={() => void handleCopyLink()}>
+      <button type="button" aria-label="Compartir o copiar el enlace de la ciudad" onClick={() => void handleCopyLink()}>
         🔗
       </button>
       {message !== null && <p className="city-toolbar__message" role="status">{message}</p>}
