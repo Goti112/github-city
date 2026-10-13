@@ -716,6 +716,21 @@
   white-space: nowrap;
   pointer-events: none;
   user-select: none;
+  /* Wait for the tower to finish rising before its name tag appears. */
+  animation: landmark-tag-in 0.6s ease-out 2.6s both;
+}
+
+@keyframes landmark-tag-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landmark-tag {
+    animation: none;
+  }
 }
 
 .landmark-tag span {
