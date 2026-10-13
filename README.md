@@ -66,7 +66,7 @@ flowchart LR
 
 ## Decisiones técnicas
 
-- **Lógica pura y testeada:** el transformador de GitHub, el layout, las cifras, el marcador del duelo, la línea temporal, el buscador, el encuadre y los movimientos de cámara, el tráfico y las etiquetas de compartir son funciones puras con tests. Los componentes interactivos (buscador, línea temporal, formulario de duelo) tienen tests con Testing Library, y páginas y componentes pasan una auditoría automática de accesibilidad con axe-core. En total, 130 tests en Vitest.
+- **Lógica pura y testeada:** el transformador de GitHub, el layout, las cifras, el marcador del duelo, la línea temporal, el buscador, el encuadre y los movimientos de cámara, el tráfico y las etiquetas de compartir son funciones puras con tests. Los componentes interactivos (buscador, línea temporal, formulario de duelo) tienen tests con Testing Library, y páginas y componentes pasan una auditoría automática de accesibilidad con axe-core. En total, 130 tests en Vitest, más 14 tests end-to-end con Playwright (7 escenarios en escritorio y móvil) contra la build de producción con la API simulada.
 - **Rendimiento:** todos los edificios se dibujan con un único `InstancedMesh`; ventanas, coronas de neón y calles se calculan en shaders, sin geometría extra. La escena 3D se carga bajo demanda: el bundle inicial pesa ~200 kB y Three.js llega aparte. Si el dispositivo no mantiene una tasa de fotogramas fluida, la resolución de renderizado baja automáticamente.
 - **Cámara adaptativa:** el encuadre y la niebla se calculan a partir del tamaño de la ciudad, su edificio más alto y la proporción de la pantalla, así que una ciudad de 5 repos y una de 100 se ven enteras, también en vertical.
 - **Accesibilidad:** los movimientos de cámara se omiten con `prefers-reduced-motion`; cualquier edificio es accesible sin ratón desde el buscador (combobox ARIA con flechas, Enter y Esc), y barra de herramientas, línea temporal y panel son controles HTML accesibles con teclado.
@@ -74,7 +74,7 @@ flowchart LR
 
 ## Stack
 
-React 18 · TypeScript · Vite · React Three Fiber · Drei · postprocessing · React Router · Vercel Functions y Routing Middleware · `@vercel/og` · GitHub GraphQL API · Vitest · Testing Library · axe-core · Oxlint · GitHub Actions
+React 18 · TypeScript · Vite · React Three Fiber · Drei · postprocessing · React Router · Vercel Functions y Routing Middleware · `@vercel/og` · GitHub GraphQL API · Vitest · Testing Library · axe-core · Playwright · Oxlint · GitHub Actions
 
 ## Ejecutar en local
 
@@ -90,6 +90,7 @@ npm start              # vercel dev: front + funciones + middleware en http://lo
 npm run lint   # oxlint + comprobación de tipos de api/ y middleware
 npm test
 npm run build
+npm run test:e2e   # Playwright (primera vez: npx playwright install chromium)
 ```
 
 ## In English
