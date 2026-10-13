@@ -8,9 +8,10 @@ export default async function middleware(request: Request): Promise<Response> {
   const [, section = '', first = '', second = ''] = url.pathname.split('/').map(decodeURIComponent)
   const page = await fetch(new URL('/index.html', url.origin))
   const html = await page.text()
+  const lang = url.searchParams.get('lang') === 'en' ? 'en' : 'es'
   const personalized = section === 'vs'
-    ? personalizeDuelHtml(html, first, second, url.origin)
-    : personalizeHtml(html, first, url.origin)
+    ? personalizeDuelHtml(html, first, second, url.origin, lang)
+    : personalizeHtml(html, first, url.origin, lang)
 
   return new Response(personalized, {
     status: page.status,

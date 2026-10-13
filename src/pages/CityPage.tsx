@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactElement } from 'react'
+import { useLang, useStrings } from '../i18n/useLang'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { CityError, fetchCity } from '../lib/api'
 import { cityLayout } from '../lib/cityLayout'
@@ -55,6 +56,8 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
     selectedRepo: null,
   }))
   const [timeOfDay, setTimeOfDay] = useState<number>(0.5)
+  const t = useStrings()
+  const lang = useLang()
   const [visibleYear, setVisibleYear] = useState<number | null>(null)
   const [canvas, setCanvas] = useState<HTMLCanvasElement | null>(null)
   const [retryCount, setRetryCount] = useState<number>(0)
@@ -201,10 +204,14 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
       return
     }
     const next = writeCityParams({ repo: selectedName, year: visibleYear })
+    // Keep the language in shared links so an English visitor shares the English city.
+    if (lang === 'en') {
+      next.set('lang', 'en')
+    }
     if (next.toString() !== searchParams.toString()) {
       setSearchParams(next, { replace: true })
     }
-  }, [searchParams, selectedName, setSearchParams, visibleYear])
+  }, [lang, searchParams, selectedName, setSearchParams, visibleYear])
   const handleFinderSelect = useCallback((repo: Repo): void => {
     setFinderOpen(false)
     setInteractionState((current) => ({ ...current, selectedRepo: repo }))
@@ -257,8 +264,8 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
           key={`loading:${sceneAttempt}`}
           fallback={(
             <StatusScreen role="alert">
-              <p>La escena 3D no está disponible.</p>
-              <button type="button" onClick={handleSceneRetry}>Reintentar escena</button>
+              <p>{t.sceneUnavailable}</p>
+              <button type="button" onClick={handleSceneRetry}>{t.retryScene}</button>
             </StatusScreen>
           )}
         >
@@ -271,19 +278,19 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
               autoRotateSpeed={0}
               showLandmark={false}
             />
-            <StatusScreen role="status"><p>Levantando tu ciudad…</p></StatusScreen>
+            <StatusScreen role="status"><p>{t.loadingCity}</p></StatusScreen>
           </>
         </SceneErrorBoundary>
       )}
       {state.status === 'error' && (
         <StatusScreen role="alert">
-          {state.code === 'RATE_LIMITED' && <p>GitHub nos pide un respiro. Prueba en un minuto.</p>}
-          {state.code === 'UPSTREAM_ERROR' && <p>Algo ha fallado al hablar con GitHub.</p>}
-          {state.code === 'INVALID_USERNAME' && <p>Ese nombre de usuario no es válido.</p>}
+          {state.code === 'RATE_LIMITED' && <p>{t.rateLimited}</p>}
+          {state.code === 'UPSTREAM_ERROR' && <p>{t.upstreamError}</p>}
+          {state.code === 'INVALID_USERNAME' && <p>{t.invalidUserLong}</p>}
           {state.code === 'INVALID_USERNAME'
             ? <SearchBar />
-            : <button type="button" onClick={handleRetry}>Reintentar</button>}
-          {state.code === 'INVALID_USERNAME' && <Link to="/">Volver al inicio</Link>}
+            : <button type="button" onClick={handleRetry}>{t.retry}</button>}
+          {state.code === 'INVALID_USERNAME' && <Link to="/">{t.backHome}</Link>}
         </StatusScreen>
       )}
       {state.status === 'ok' && (
@@ -293,8 +300,8 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
             onError={() => setCanvas(null)}
             fallback={(
               <StatusScreen role="alert">
-                <p>La escena 3D no está disponible.</p>
-                <button type="button" onClick={handleSceneRetry}>Reintentar escena</button>
+                <p>{t.sceneUnavailable}</p>
+                <button type="button" onClick={handleSceneRetry}>{t.retryScene}</button>
               </StatusScreen>
             )}
           >
@@ -324,7 +331,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
           {badgeOpen && <BadgePopover login={state.data.user.login} />}
           {duelOpen && (
             <div className="duel-popover" role="dialog" aria-label="Duelo de ciudades">
-              <p>Reta a otro perfil</p>
+              <p>{t.challenge}</p>
               <CompareForm left={state.data.user.login} compact />
             </div>
           )}
@@ -342,7 +349,7 @@ const CityPageContent = ({ user }: CityPageContentProps): ReactElement => {
             <RepoFinder repos={state.data.repos} onSelect={handleFinderSelect} onClose={() => setFinderOpen(false)} />
           )}
           {state.data.repos.length === 0 && (
-            <StatusScreen role="status"><p>🚧 En obras: aún no hay repos públicos</p></StatusScreen>
+            <StatusScreen role="status"><p>{t.emptyCity}</p></StatusScreen>
           )}
           <UserCard
             user={state.data.user}

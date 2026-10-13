@@ -35,7 +35,7 @@ const UserCard = ({ user, repositoryCount, totalContributions, stats }: UserCard
       </div>
       <div>
         <dt>{t.population}</dt>
-        <dd title="Commits en las ramas principales">{numberFormat.format(stats.population)}</dd>
+        <dd title={t.populationHint}>{numberFormat.format(stats.population)}</dd>
       </div>
       <div className="user-card__stat--extra">
         <dt>{t.districts}</dt>
@@ -43,7 +43,7 @@ const UserCard = ({ user, repositoryCount, totalContributions, stats }: UserCard
       </div>
       <div className="user-card__stat--extra">
         <dt>{t.lit}</dt>
-        <dd title="Repos con actividad en los últimos 30 días">{numberFormat.format(stats.litBuildings)}</dd>
+        <dd title={t.litHint}>{numberFormat.format(stats.litBuildings)}</dd>
       </div>
       <div className="user-card__stat--extra">
         <dt>{t.stars}</dt>

@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactElement } from 'react'
+import { useStrings } from '../i18n/useLang'
 import type { Repo } from '../lib/types'
 
 type RepoPanelProps = {
@@ -38,6 +39,7 @@ const numberFormat = new Intl.NumberFormat('es')
 const monthYearFormat = new Intl.DateTimeFormat('es', { month: 'long', year: 'numeric', timeZone: 'UTC' })
 
 const RepoPanel = ({ repo, onClose }: RepoPanelProps): ReactElement => {
+  const t = useStrings()
   const [now] = useState<Date>(() => new Date())
 
   useEffect(() => {
@@ -56,7 +58,7 @@ const RepoPanel = ({ repo, onClose }: RepoPanelProps): ReactElement => {
       <button
         className="repo-panel__close"
         type="button"
-        aria-label="Cerrar panel del repositorio"
+        aria-label={t.closeRepo}
         onClick={onClose}
       >
         ×
@@ -64,11 +66,11 @@ const RepoPanel = ({ repo, onClose }: RepoPanelProps): ReactElement => {
       <p className="repo-panel__eyebrow">{repo.language ?? 'Otros'}</p>
       <h2 className="repo-panel__title" id="repo-panel-title">{repo.name}</h2>
       <p className="repo-panel__description">
-        {repo.description ?? 'Este repositorio no tiene descripción.'}
+        {repo.description ?? t.noDescription}
       </p>
       <dl className="repo-panel__stats">
         <div>
-          <dt>Estrellas</dt>
+          <dt>{t.stars}</dt>
           <dd>⭐ {numberFormat.format(repo.stars)}</dd>
         </div>
         <div>
@@ -76,16 +78,16 @@ const RepoPanel = ({ repo, onClose }: RepoPanelProps): ReactElement => {
           <dd>{numberFormat.format(repo.commits)}</dd>
         </div>
         <div>
-          <dt>Último push</dt>
+          <dt>{t.lastPush}</dt>
           <dd><time dateTime={repo.lastPush}>{formatRelativeTime(repo.lastPush, now)}</time></dd>
         </div>
         <div>
-          <dt>Construido en</dt>
+          <dt>{t.builtIn}</dt>
           <dd><time dateTime={repo.createdAt}>{monthYearFormat.format(new Date(repo.createdAt))}</time></dd>
         </div>
       </dl>
       <a className="repo-panel__link" href={repo.url} target="_blank" rel="noopener">
-        Ver en GitHub <span aria-hidden="true">↗</span>
+        {t.viewOnGithub} <span aria-hidden="true">↗</span>
       </a>
     </aside>
   )

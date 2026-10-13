@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import { cityStats } from '../src/lib/cityStats.js'
 import { compareCities, type ComparableCity } from '../src/lib/compare.js'
 import type { CityResponse } from '../src/lib/types.js'
+import { cityTitles, strings } from '../src/i18n/strings.js'
 import { loadCity } from './_lib/loadCity.js'
 import { avatar, card, div, fallbackCard, footer, numberFormat } from './_lib/ogParts.js'
 
@@ -18,7 +19,7 @@ const comparable = (city: CityResponse, now: Date): ComparableCity => {
   }
 }
 
-const player = (city: CityResponse, title: string, buildings: number, winner: boolean): ReactNode => div(
+const player = (city: CityResponse, title: string, buildings: string, winner: boolean): ReactNode => div(
   { display: 'flex', flexDirection: 'column', alignItems: 'center', width: 360 },
   div({ display: 'flex', fontSize: 44, height: 56 }, winner ? '👑' : ''),
   div(
@@ -27,11 +28,18 @@ const player = (city: CityResponse, title: string, buildings: number, winner: bo
   ),
   div({ display: 'flex', fontSize: 40, fontWeight: 700, marginTop: 18 }, city.user.name ?? city.user.login),
   div({ display: 'flex', fontSize: 24, color: '#8fa3b1', marginTop: 4 }, `@${city.user.login} · ${title}`),
-  div({ display: 'flex', fontSize: 24, color: '#a9bac5', marginTop: 10 }, `${numberFormat.format(buildings)} edificios`),
+  div({ display: 'flex', fontSize: 24, color: '#a9bac5', marginTop: 10 }, buildings),
 )
 
 export const GET = async (request: Request): Promise<Response> => {
   const params = new URL(request.url).searchParams
+  const en = params.get('lang') === 'en'
+  const t = strings[en ? 'en' : 'es']
+  const titleOf = (city: CityResponse): string => {
+    const title = cityStats(city.repos, now).title
+    return en ? cityTitles[title] ?? title : title
+  }
+  const size = (city: CityResponse): string => `${numberFormat.format(city.repos.length)} ${t.buildings.toLowerCase()}`
   const [left, right] = await Promise.all([loadCity(params.get('a') ?? ''), loadCity(params.get('b') ?? '')])
   if (!left.ok || !right.ok) {
     return fallbackCard()
@@ -40,22 +48,22 @@ export const GET = async (request: Request): Promise<Response> => {
   const now = new Date()
   const result = compareCities(comparable(left.city, now), comparable(right.city, now))
   const verdict = result.overall === 'tie'
-    ? 'Empate técnico'
-    : `Gana @${result.overall === 'left' ? left.city.user.login : right.city.user.login}`
+    ? t.tie
+    : t.wins(result.overall === 'left' ? left.city.user.login : right.city.user.login)
 
   return card(true, [
     div(
       { display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', paddingTop: 44 },
-      div({ display: 'flex', fontSize: 24, color: '#73e0c0', letterSpacing: 6 }, 'GITHUB CITY · DUELO DE CIUDADES'),
+      div({ display: 'flex', fontSize: 24, color: '#73e0c0', letterSpacing: 6 }, `GITHUB CITY · ${t.duelHeading.toUpperCase()}`),
       div(
         { display: 'flex', alignItems: 'center', justifyContent: 'center', marginTop: 16 },
-        player(left.city, cityStats(left.city.repos, now).title, left.city.repos.length, result.overall === 'left'),
+        player(left.city, titleOf(left.city), size(left.city), result.overall === 'left'),
         div(
           { display: 'flex', flexDirection: 'column', alignItems: 'center', width: 260 },
           div({ display: 'flex', fontSize: 96, fontWeight: 800 }, `${result.score.left} – ${result.score.right}`),
           div({ display: 'flex', fontSize: 30, color: '#ffd166', marginTop: 4 }, verdict),
         ),
-        player(right.city, cityStats(right.city.repos, now).title, right.city.repos.length, result.overall === 'right'),
+        player(right.city, titleOf(right.city), size(right.city), result.overall === 'right'),
       ),
     ),
     footer(),

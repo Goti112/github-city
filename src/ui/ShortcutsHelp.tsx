@@ -1,19 +1,12 @@
 import { useEffect, useRef, type ReactElement } from 'react'
+import { useStrings } from '../i18n/useLang'
 
 type ShortcutsHelpProps = {
   onClose: () => void
 }
 
-const shortcuts: Array<[string, string]> = [
-  ['/', 'Buscar un edificio'],
-  ['Esc', 'Cerrar panel o buscador'],
-  ['?', 'Mostrar u ocultar esta ayuda'],
-  ['Arrastrar', 'Girar la ciudad'],
-  ['Rueda / pellizco', 'Acercar y alejar'],
-  ['Clic en un edificio', 'Volar hasta él y ver su repo'],
-]
-
 const ShortcutsHelp = ({ onClose }: ShortcutsHelpProps): ReactElement => {
+  const t = useStrings()
   const closeRef = useRef<HTMLButtonElement | null>(null)
 
   useEffect(() => {
@@ -30,11 +23,11 @@ const ShortcutsHelp = ({ onClose }: ShortcutsHelpProps): ReactElement => {
   return (
     <div className="shortcuts-help" role="dialog" aria-modal="false" aria-labelledby="shortcuts-help-title">
       <div className="shortcuts-help__header">
-        <h2 id="shortcuts-help-title">Cómo moverte por la ciudad</h2>
-        <button ref={closeRef} type="button" aria-label="Cerrar la ayuda" onClick={onClose}>×</button>
+        <h2 id="shortcuts-help-title">{t.helpTitle}</h2>
+        <button ref={closeRef} type="button" aria-label={t.closeHelp} onClick={onClose}>×</button>
       </div>
       <dl>
-        {shortcuts.map(([keys, action]) => (
+        {t.shortcuts.map(([keys, action]) => (
           <div key={keys}>
             <dt><kbd>{keys}</kbd></dt>
             <dd>{action}</dd>

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactElement } from 'react'
+import { useStrings } from '../i18n/useLang'
 import { captureCity } from './screenshot'
 
 type ToolbarProps = {
@@ -15,6 +16,7 @@ const Toolbar = ({ canvas, login, timeOfDay, onToggleTime, onOpenFinder, onOpenD
   const [message, setMessage] = useState<string | null>(null)
   const messageTimeout = useRef<number | null>(null)
   const isNight = timeOfDay >= 0.75
+  const t = useStrings()
 
   const showMessage = useCallback((nextMessage: string, duration: number): void => {
     if (messageTimeout.current !== null) {
@@ -49,12 +51,12 @@ const Toolbar = ({ canvas, login, timeOfDay, onToggleTime, onOpenFinder, onOpenD
       link.click()
       link.remove()
       window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000)
-      showMessage('Captura descargada.', 2000)
+      showMessage(t.captureDone, 2000)
     } catch (error: unknown) {
       console.error('No se pudo descargar la captura de la ciudad', { error, login })
-      showMessage('No se pudo generar la captura. Inténtalo de nuevo.', 4000)
+      showMessage(t.captureError, 4000)
     }
-  }, [canvas, login, showMessage])
+  }, [canvas, login, showMessage, t])
 
   const handleCopyLink = useCallback(async (): Promise<void> => {
     const url = window.location.href
@@ -71,35 +73,35 @@ const Toolbar = ({ canvas, login, timeOfDay, onToggleTime, onOpenFinder, onOpenD
     }
     try {
       await navigator.clipboard.writeText(url)
-      showMessage('¡Enlace copiado!', 2000)
+      showMessage(t.linkCopied, 2000)
     } catch (error: unknown) {
       console.error('No se pudo copiar el enlace de la ciudad', { error, login })
-      showMessage('No se pudo copiar el enlace. Revisa los permisos del navegador.', 4000)
+      showMessage(t.linkError, 4000)
     }
-  }, [login, showMessage])
+  }, [login, showMessage, t])
 
   return (
-    <div className="city-toolbar" role="group" aria-label="Acciones de la ciudad">
-      <button type="button" aria-label="Buscar un edificio (atajo: /)" title="Buscar un edificio (/) · Atajos de teclado (?)" onClick={onOpenFinder}>
+    <div className="city-toolbar" role="group" aria-label={t.toolbarGroup}>
+      <button type="button" aria-label={t.findButton} title={t.findTitle} onClick={onOpenFinder}>
         🔍
       </button>
-      <button type="button" aria-label="Badge de tu ciudad para el README" title="Badge para tu README" onClick={onOpenBadge}>
+      <button type="button" aria-label={t.badgeButton} title={t.badgeDialog} onClick={onOpenBadge}>
         📛
       </button>
-      <button type="button" aria-label="Retar a otro perfil a un duelo" title="Duelo de ciudades" onClick={onOpenDuel}>
+      <button type="button" aria-label={t.duelButtonLabel} title={t.duelHeading} onClick={onOpenDuel}>
         ⚔️
       </button>
       <button
         type="button"
-        aria-label={isNight ? 'Cambiar a día' : 'Cambiar a noche'}
+        aria-label={isNight ? t.toDay : t.toNight}
         onClick={onToggleTime}
       >
-        {isNight ? '☀️ Día' : '🌙 Noche'}
+        {isNight ? t.day : t.night}
       </button>
-      <button type="button" aria-label="Descargar captura PNG" disabled={canvas === null} onClick={() => void handleCapture()}>
+      <button type="button" aria-label={t.capture} disabled={canvas === null} onClick={() => void handleCapture()}>
         📸
       </button>
-      <button type="button" aria-label="Compartir o copiar el enlace de la ciudad" onClick={() => void handleCopyLink()}>
+      <button type="button" aria-label={t.share} onClick={() => void handleCopyLink()}>
         🔗
       </button>
       {message !== null && <p className="city-toolbar__message" role="status">{message}</p>}

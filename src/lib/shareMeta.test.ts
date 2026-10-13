@@ -41,3 +41,18 @@ describe('personalizeDuelHtml', () => {
     expect(personalizeDuelHtml(html, 'gaearon', '<x>', origin)).toBe(html)
   })
 })
+
+describe('English share cards', () => {
+  it('translates the city card and keeps the language in its links', () => {
+    const result = personalizeHtml(html, 'Goti112', origin, 'en')
+    expect(result).toContain("<title>@Goti112's city · GitHub City</title>")
+    expect(result).toContain('content="https://city.miquelmanzano.com/api/og/Goti112?lang=en"')
+    expect(result).toContain('content="https://city.miquelmanzano.com/ciudad/Goti112?lang=en"')
+  })
+
+  it('translates the duel card', () => {
+    const result = personalizeDuelHtml(html, 'gaearon', 'Goti112', origin, 'en')
+    expect(result).toContain('City duel')
+    expect(result).toContain('a=gaearon&amp;b=Goti112&amp;lang=en')
+  })
+})

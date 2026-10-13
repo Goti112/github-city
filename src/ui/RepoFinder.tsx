@@ -1,4 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent, type ReactElement } from 'react'
+import { useStrings } from '../i18n/useLang'
 import { searchRepos } from '../lib/searchRepos'
 import type { Repo } from '../lib/types'
 
@@ -12,6 +13,7 @@ const numberFormat = new Intl.NumberFormat('es')
 
 // Keyboard-first way to reach any building: also the accessible alternative to clicking in 3D.
 const RepoFinder = ({ repos, onSelect, onClose }: RepoFinderProps): ReactElement => {
+  const t = useStrings()
   const [query, setQuery] = useState('')
   const [active, setActive] = useState(0)
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -45,7 +47,7 @@ const RepoFinder = ({ repos, onSelect, onClose }: RepoFinderProps): ReactElement
   }
 
   return (
-    <div className="repo-finder" role="dialog" aria-label="Buscar un edificio">
+    <div className="repo-finder" role="dialog" aria-label={t.finderDialog}>
       <input
         ref={inputRef}
         type="search"
@@ -53,8 +55,8 @@ const RepoFinder = ({ repos, onSelect, onClose }: RepoFinderProps): ReactElement
         aria-expanded={results.length > 0}
         aria-controls={listId}
         aria-activedescendant={results[active] === undefined ? undefined : `${listId}-${active}`}
-        aria-label="Buscar un repositorio por nombre o lenguaje"
-        placeholder="Buscar edificio por nombre o lenguaje…"
+        aria-label={t.finderLabel}
+        placeholder={t.finderPlaceholder}
         value={query}
         onChange={(event) => {
           setQuery(event.currentTarget.value)
@@ -81,7 +83,7 @@ const RepoFinder = ({ repos, onSelect, onClose }: RepoFinderProps): ReactElement
             <span className="repo-finder__meta">{repo.language ?? 'Otros'} · {numberFormat.format(repo.commits)} commits</span>
           </li>
         ))}
-        {results.length === 0 && <li className="repo-finder__empty" role="presentation">Ningún edificio coincide</li>}
+        {results.length === 0 && <li className="repo-finder__empty" role="presentation">{t.finderEmpty}</li>}
       </ul>
     </div>
   )

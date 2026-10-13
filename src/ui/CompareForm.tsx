@@ -1,4 +1,5 @@
 import { useState, type FormEvent, type ReactElement } from 'react'
+import { useStrings } from '../i18n/useLang'
 import { useNavigate } from 'react-router-dom'
 import { normalizeUsername } from '../lib/search'
 
@@ -11,6 +12,7 @@ type CompareFormProps = {
 // "@a vs @b" form that opens the city duel.
 const CompareForm = ({ left = '', compact = false }: CompareFormProps): ReactElement => {
   const navigate = useNavigate()
+  const t = useStrings()
   const [first, setFirst] = useState(left)
   const [second, setSecond] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -20,11 +22,11 @@ const CompareForm = ({ left = '', compact = false }: CompareFormProps): ReactEle
     const a = normalizeUsername(first)
     const b = normalizeUsername(second)
     if (a === null || b === null) {
-      setError('Escribe dos usuarios de GitHub válidos')
+      setError(t.duelInvalid)
       return
     }
     if (a.toLowerCase() === b.toLowerCase()) {
-      setError('Elige a alguien distinto para el duelo')
+      setError(t.duelSelf)
       return
     }
     navigate(`/vs/${a}/${b}`)
@@ -34,8 +36,8 @@ const CompareForm = ({ left = '', compact = false }: CompareFormProps): ReactEle
     <form className={`compare-form${compact ? ' compare-form--compact' : ''}`} onSubmit={handleSubmit}>
       {!compact && (
         <input
-          aria-label="Primer usuario"
-          placeholder="usuario"
+          aria-label={t.firstUser}
+          placeholder={t.firstPlaceholder}
           value={first}
           onChange={(event) => {
             setFirst(event.currentTarget.value)
@@ -45,8 +47,8 @@ const CompareForm = ({ left = '', compact = false }: CompareFormProps): ReactEle
       )}
       <span className="compare-form__vs" aria-hidden="true">vs</span>
       <input
-        aria-label="Usuario rival"
-        placeholder="rival"
+        aria-label={t.rivalUser}
+        placeholder={t.rivalPlaceholder}
         value={second}
         autoFocus={compact}
         onChange={(event) => {
@@ -54,7 +56,7 @@ const CompareForm = ({ left = '', compact = false }: CompareFormProps): ReactEle
           setError(null)
         }}
       />
-      <button type="submit">⚔️ Duelo</button>
+      <button type="submit">{t.duelButton}</button>
       {error !== null && <p className="compare-form__error" role="alert">{error}</p>}
     </form>
   )

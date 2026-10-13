@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { cityStats } from '../../src/lib/cityStats.js'
 import { skylineBars } from '../../src/lib/skyline.js'
+import { cityTitles, strings } from '../../src/i18n/strings.js'
 import { loadCity } from '../_lib/loadCity.js'
 import { avatar, card, div, fallbackCard, footer, numberFormat } from '../_lib/ogParts.js'
 
@@ -42,6 +43,8 @@ const building = (bar: ReturnType<typeof skylineBars>[number]): ReactNode => {
 }
 
 export const GET = async (request: Request): Promise<Response> => {
+  const t = strings[new URL(request.url).searchParams.get('lang') === 'en' ? 'en' : 'es']
+  const en = t === strings.en
   const login = new URL(request.url).pathname.split('/').pop() ?? ''
   const result = await loadCity(decodeURIComponent(login))
 
@@ -56,7 +59,7 @@ export const GET = async (request: Request): Promise<Response> => {
   return card(true, [
     div(
       { display: 'flex', flexDirection: 'column', padding: '64px 0 0 64px', width: 600 },
-      div({ fontSize: 24, color: '#73e0c0', letterSpacing: 4, display: 'flex' }, `GITHUB CITY · ${stats.title.toUpperCase()}`),
+      div({ fontSize: 24, color: '#73e0c0', letterSpacing: 4, display: 'flex' }, `GITHUB CITY · ${(en ? cityTitles[stats.title] ?? stats.title : stats.title).toUpperCase()}`),
       div({ display: 'flex', alignItems: 'center', marginTop: 26 },
         div({ display: 'flex', marginRight: 24 }, avatar(city.user.avatarUrl, 96)),
         div({ display: 'flex', flexDirection: 'column' },
@@ -65,9 +68,9 @@ export const GET = async (request: Request): Promise<Response> => {
         ),
       ),
       div({ display: 'flex', marginTop: 48 },
-        stat('Edificios', city.repos.length),
-        stat('Habitantes', stats.population),
-        stat('Estrellas', stats.stars),
+        stat(t.buildings, city.repos.length),
+        stat(t.population, stats.population),
+        stat(t.stars, stats.stars),
       ),
     ),
     div(
