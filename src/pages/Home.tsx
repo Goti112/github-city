@@ -18,6 +18,14 @@ const exampleProfiles: ExampleProfile[] = [
   { login: 'gaearon', name: 'Dan Abramov' },
 ]
 
+// Big, well-known profiles that make impressive cities to explore.
+const famousCities: ExampleProfile[] = [
+  { login: 'sindresorhus', name: 'Sindre Sorhus' },
+  { login: 'yyx990803', name: 'Evan You' },
+  { login: 'tj', name: 'TJ Holowaychuk' },
+  { login: 'addyosmani', name: 'Addy Osmani' },
+]
+
 const Home = (): ReactElement => {
   const [now] = useState<Date>(() => new Date())
   const [sceneAttempt, setSceneAttempt] = useState<number>(0)
@@ -58,6 +66,12 @@ const Home = (): ReactElement => {
         <div className="home-page__examples">
           <span>Prueba con</span>
           {exampleProfiles.map(({ login, name }) => (
+            <Link key={login} to={`/ciudad/${login}`}>{name}</Link>
+          ))}
+        </div>
+        <div className="home-page__examples home-page__examples--famous">
+          <span>Metrópolis famosas</span>
+          {famousCities.map(({ login, name }) => (
             <Link key={login} to={`/ciudad/${login}`}>{name}</Link>
           ))}
         </div>

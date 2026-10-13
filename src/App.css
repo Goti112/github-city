@@ -1267,3 +1267,7 @@
     bottom: calc(128px + env(safe-area-inset-bottom));
   }
 }
+
+.home-page__examples--famous {
+  margin-top: -6px;
+}
