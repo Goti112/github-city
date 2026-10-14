@@ -7,6 +7,8 @@ export default defineConfig({
   testMatch: '**/*.e2e.ts',
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,
+  // Every worker renders WebGL in software; more than two at once starves the CPU and makes tests flaky.
+  workers: 2,
   reporter: process.env.CI ? 'github' : 'list',
   use: {
     baseURL: 'http://127.0.0.1:4173',
