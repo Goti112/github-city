@@ -3,7 +3,7 @@ import { cityTitles } from '../i18n/strings.js'
 export type BadgeData = { title: string; buildings: number; stars: number } | { message: string }
 export type BadgeLang = 'es' | 'en'
 
-const numberFormats = { es: new Intl.NumberFormat('es'), en: new Intl.NumberFormat('en') }
+const numberFormats = { es: new Intl.NumberFormat('es', { useGrouping: 'always' }), en: new Intl.NumberFormat('en', { useGrouping: 'always' }) }
 const buildingWords = { es: ['edificio', 'edificios'], en: ['building', 'buildings'] }
 
 const escapeXml = (text: string): string =>
