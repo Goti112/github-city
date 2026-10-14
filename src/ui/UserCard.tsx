@@ -17,12 +17,14 @@ const UserCard = ({ user, repositoryCount, totalContributions, stats }: UserCard
   const { number: numberFormat, percent: percentFormat } = useFormats()
   const title = useCityTitle(stats.title)
   return (
-  <section className="user-card" aria-label={`Perfil de GitHub de ${user.login}`}>
+  <section className="user-card" aria-label={t.profileLabel(user.login)}>
+    <div className="user-card__top">
+      <p className="user-card__eyebrow">GitHub City · <span>{title}</span></p>
+      <LangSwitch className="user-card__lang" />
+    </div>
     <div className="user-card__header">
-      <img className="user-card__avatar" src={user.avatarUrl} alt={`Avatar de ${user.login}`} />
+      <img className="user-card__avatar" src={user.avatarUrl} alt={t.avatarAlt(user.login)} />
       <div className="user-card__content">
-        <LangSwitch className="user-card__lang" />
-        <p className="user-card__eyebrow">GitHub City · <span>{title}</span></p>
         <h1 className="user-card__name">{user.name ?? user.login}</h1>
         <p className="user-card__login">@{user.login}</p>
       </div>

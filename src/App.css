@@ -1326,7 +1326,14 @@
   right: 18px;
 }
 
-.user-card__lang {
-  float: right;
-  margin-left: 8px;
+.user-card__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.user-card__top .user-card__eyebrow {
+  margin: 0;
 }
