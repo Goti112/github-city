@@ -58,6 +58,8 @@ const fragmentWindows = [
   'windowFrame = mix(windowFrame, 0.48, windowFar);',
   'windowFrame *= step(windowCell.y, windowRows - 1.0);',
   'float isWall = 1.0 - step(0.5, abs(vWindowFaceNormal.y));',
+  // By day the panes read as dark glass, so facades are not blank slabs before nightfall.
+  'diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.13, 0.2, 0.28), windowFrame * isWall * 0.7);',
   'float windowIsLit = step(cityWindowHash(windowCell, vSeed), clamp(vLit, 0.0, 1.0));',
   'totalEmissiveRadiance += vec3(1.0, 0.42, 0.13) * windowFrame * isWall * windowIsLit * uGlow;',
 // Neon crown: a band in the district colour along the top of each facade, plus a faint roof glow.
@@ -98,6 +100,6 @@ export const createWindowsMaterial = (windowGlow: WindowGlowUniform): MeshStanda
     )
   }
 
-  material.customProgramCacheKey = (): string => 'github-city-windows-v3'
+  material.customProgramCacheKey = (): string => 'github-city-windows-v4'
   return material
 }
