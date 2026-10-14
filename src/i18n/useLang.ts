@@ -47,7 +47,8 @@ export type Formats = {
 }
 
 const makeFormats = (lang: Lang): Formats => ({
-  number: new Intl.NumberFormat(lang),
+  // Spanish skips the separator on four-digit numbers (4085 next to 45.517); side-by-side stats read better with it.
+  number: new Intl.NumberFormat(lang, { useGrouping: 'always' }),
   percent: new Intl.NumberFormat(lang, { style: 'percent', maximumFractionDigits: 0 }),
   relative: new Intl.RelativeTimeFormat(lang, { numeric: 'auto' }),
   monthYear: new Intl.DateTimeFormat(lang, { month: 'long', year: 'numeric', timeZone: 'UTC' }),
