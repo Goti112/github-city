@@ -69,7 +69,7 @@
   inset: 0;
   background:
     /* Darken only behind the copy so the city stays visible around it. */
-    radial-gradient(ellipse 46% 40% at 50% 50%, rgba(6, 13, 18, 0.72), rgba(6, 13, 18, 0.12) 100%),
+    radial-gradient(ellipse 50% 52% at 50% 52%, rgba(6, 13, 18, 0.84), rgba(6, 13, 18, 0.5) 60%, rgba(6, 13, 18, 0.1) 100%),
     linear-gradient(180deg, rgba(6, 13, 18, 0.05) 60%, rgba(6, 13, 18, 0.55));
   pointer-events: none;
 }
