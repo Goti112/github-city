@@ -4,15 +4,17 @@ import { loadCity } from '../_lib/loadCity.js'
 
 // README badge: <img src="https://city.miquelmanzano.com/api/badge/:user">
 export const GET = async (request: Request): Promise<Response> => {
-  const login = decodeURIComponent(new URL(request.url).pathname.split('/').pop() ?? '')
+  const url = new URL(request.url)
+  const login = decodeURIComponent(url.pathname.split('/').pop() ?? '')
+  const lang = url.searchParams.get('lang') === 'en' ? 'en' : 'es'
   const result = await loadCity(login)
   const svg = result.ok
     ? badgeSvg({
         title: cityStats(result.city.repos, new Date()).title,
         buildings: result.city.repos.length,
         stars: result.city.repos.reduce((sum, repo) => sum + repo.stars, 0),
-      })
-    : badgeSvg({ message: 'perfil no disponible' })
+      }, lang)
+    : badgeSvg({ message: lang === 'en' ? 'profile unavailable' : 'perfil no disponible' }, lang)
 
   return new Response(svg, {
     headers: {

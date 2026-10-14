@@ -38,10 +38,23 @@ describe('badgeSvg', () => {
   })
 })
 
+describe('badgeSvg in English', () => {
+  it('translates the title and uses English number formatting', () => {
+    expect(badgeSvg({ title: 'Metrópolis', buildings: 61, stars: 45493 }, 'en')).toContain('Metropolis · 61 buildings · ★ 45,493')
+    expect(badgeSvg({ title: 'Aldea', buildings: 1, stars: 0 }, 'en')).toContain('Hamlet · 1 building<')
+  })
+})
+
 describe('badgeMarkdown', () => {
   it('links the badge to the city page', () => {
     expect(badgeMarkdown('Goti112', 'https://city.miquelmanzano.com')).toBe(
       '[![Mi GitHub City](https://city.miquelmanzano.com/api/badge/Goti112)](https://city.miquelmanzano.com/ciudad/Goti112)',
+    )
+  })
+
+  it('points to the English badge and city when asked', () => {
+    expect(badgeMarkdown('Goti112', 'https://city.miquelmanzano.com', 'en')).toBe(
+      '[![My GitHub City](https://city.miquelmanzano.com/api/badge/Goti112?lang=en)](https://city.miquelmanzano.com/ciudad/Goti112?lang=en)',
     )
   })
 })

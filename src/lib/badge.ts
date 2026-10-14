@@ -1,6 +1,10 @@
-export type BadgeData = { title: string; buildings: number; stars: number } | { message: string }
+import { cityTitles } from '../i18n/strings.js'
 
-const numberFormat = new Intl.NumberFormat('es')
+export type BadgeData = { title: string; buildings: number; stars: number } | { message: string }
+export type BadgeLang = 'es' | 'en'
+
+const numberFormats = { es: new Intl.NumberFormat('es'), en: new Intl.NumberFormat('en') }
+const buildingWords = { es: ['edificio', 'edificios'], en: ['building', 'buildings'] }
 
 const escapeXml = (text: string): string =>
   text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -9,20 +13,23 @@ const escapeXml = (text: string): string =>
 const textWidth = (text: string): number => Math.ceil(text.length * 6.6) + 20
 
 // Shields-style badge for profile READMEs: "GitHub City | Pueblo · 6 edificios · ★ 12".
-const valueParts = (data: BadgeData): string[] => {
+const valueParts = (data: BadgeData, lang: BadgeLang): string[] => {
   if ('message' in data) {
     return [data.message]
   }
-  const parts = [data.title, `${numberFormat.format(data.buildings)} ${data.buildings === 1 ? 'edificio' : 'edificios'}`]
+  const numberFormat = numberFormats[lang]
+  const [one, many] = buildingWords[lang]
+  const title = lang === 'en' ? cityTitles[data.title] ?? data.title : data.title
+  const parts = [title, `${numberFormat.format(data.buildings)} ${data.buildings === 1 ? one : many}`]
   if (data.stars > 0) {
     parts.push(`★ ${numberFormat.format(data.stars)}`)
   }
   return parts
 }
 
-export const badgeSvg = (data: BadgeData): string => {
+export const badgeSvg = (data: BadgeData, lang: BadgeLang = 'es'): string => {
   const label = 'GitHub City'
-  const parts = valueParts(data)
+  const parts = valueParts(data, lang)
   const value = escapeXml(parts.join(' · '))
   const labelWidth = textWidth(label) + 14 // room for the little skyline icon
   const valueWidth = textWidth(parts.join(' · '))
@@ -49,5 +56,8 @@ export const badgeSvg = (data: BadgeData): string => {
   ].join('')
 }
 
-export const badgeMarkdown = (login: string, origin: string): string =>
-  `[![Mi GitHub City](${origin}/api/badge/${login})](${origin}/ciudad/${login})`
+export const badgeMarkdown = (login: string, origin: string, lang: BadgeLang = 'es'): string => {
+  const query = lang === 'en' ? '?lang=en' : ''
+  const alt = lang === 'en' ? 'My GitHub City' : 'Mi GitHub City'
+  return `[![${alt}](${origin}/api/badge/${login}${query})](${origin}/ciudad/${login}${query})`
+}
